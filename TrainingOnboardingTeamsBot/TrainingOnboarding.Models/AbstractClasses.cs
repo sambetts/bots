@@ -45,6 +45,8 @@ namespace TrainingOnboarding.Models
             }
         }
         public string ID { get; set; }
+
+        public virtual bool IsValid => true;
     }
 
     public abstract class BaseSPItemWithUser : BaseSPItem

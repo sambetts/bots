@@ -17,6 +17,8 @@ namespace TrainingOnboarding.Models
         public string CourseID { get; set; }
         public string Requirement { get; set; }
 
+        public override bool IsValid => !string.IsNullOrEmpty(Requirement) && !string.IsNullOrEmpty(CourseID);
+
         public List<string> FinishedBy { get; set; } = new List<string>();
         public List<SiteUser> CompletedUsers { get; set; } = new List<SiteUser>();
     }

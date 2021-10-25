@@ -161,8 +161,6 @@ namespace TrainingOnboarding.Bot.Helpers
 
         public async Task SendCourseIntroAndTrainingRemindersToUser(CachedUserData user, ITurnContext turnContext, CancellationToken cancellationToken, PendingUserActions thisUserPendingActions, GraphServiceClient graphClient)
         {
-            await turnContext.SendActivityAsync($"Hello! You have {thisUserPendingActions.Actions.SelectMany(a => a.PendingItems).Count()} training actions to complete.");
-
             // Send seperate card for each course with outstanding items
             foreach (var course in thisUserPendingActions.UniqueCourses)
             {
@@ -172,15 +170,16 @@ namespace TrainingOnboarding.Bot.Helpers
                 // Send course intro?
                 if (!attendeeInfoForCourse.BotContacted)
                 {
-                    await turnContext.SendActivityAsync(MessageFactory.Attachment(LearningPlanListCard.GetCourseWelcome(course)), cancellationToken);
-                    
-                    // Don't send twice
+                    await turnContext.SendActivityAsync(MessageFactory.Attachment(new CourseWelcomeCard(BotConstants.BotName, course).GetCard()), cancellationToken);
+
+                    // Don't send course intro twice
+                    attendeeInfoForCourse.BotContacted = true;
                     await attendeeInfoForCourse.SaveChanges(graphClient, this.SiteId);
                 }
 
                 // Send outstanding course actions
                 var actionsForCourse = thisUserPendingActions.Actions.Where(a => a.Course == course);
-                var listCardAttachment = LearningPlanListCard.GetLearningPlanListCard(actionsForCourse, course);
+                var listCardAttachment = new LearningPlanListCard(actionsForCourse, course).GetCard();
 
                 await turnContext.SendActivityAsync(MessageFactory.Attachment(listCardAttachment), cancellationToken);
             }

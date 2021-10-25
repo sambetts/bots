@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace TrainingOnboarding.Bot
 {
-    public class BotConstants
+    public static class BotConstants
     {
+        public static string BotName => "Digital Training Assistant Bot";
     }
 }
