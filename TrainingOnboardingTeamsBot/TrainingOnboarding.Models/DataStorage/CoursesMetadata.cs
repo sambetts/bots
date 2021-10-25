@@ -6,19 +6,23 @@ using System.Threading.Tasks;
 
 namespace TrainingOnboarding.Models
 {
-
+    /// <summary>
+    /// All course data, for everyone.
+    /// </summary>
     public class CoursesMetadata
     {
+        #region Constructor & Loaders
+
         /// <summary>
         /// Load from SharePoint list results
         /// </summary>
         public CoursesMetadata(IListItemsCollectionPage coursesListItems, IListItemsCollectionPage coursesChecklistListItems,
-            IListItemsCollectionPage courseAttendanceList, IListItemsCollectionPage usersList, IListItemsCollectionPage checklistConfirmationsList)
+            IListItemsCollectionPage courseAttendanceList, IListItemsCollectionPage siteUsers, IListItemsCollectionPage checklistConfirmationsList)
         {
-            var allUsers = new List<CourseContact>();
-            foreach (var item in usersList)
+            var allUsers = new List<SiteUser>();
+            foreach (var item in siteUsers)
             {
-                allUsers.Add(new CourseContact(item));
+                allUsers.Add(new SiteUser(item));
             }
 
             var allAttendanceItems = new List<CourseAttendance>();
@@ -48,10 +52,15 @@ namespace TrainingOnboarding.Models
 
                 var courseCheckListItems = allCheckListItems.Where(l => l.CourseID == course.ID);
                 course.CheckListItems.AddRange(courseCheckListItems);
-                course.Attendees.AddRange(allAttendanceItems.Where(a => a.CourseId == course.ID).Select(a => a.User));
+                course.Attendees.AddRange(allAttendanceItems.Where(a => a.CourseId == course.ID));
             }
         }
 
+        /// <summary>
+        /// Load metadata from Graph & SharePoint
+        /// </summary>
+        /// <param name="graphClient">Loader client</param>
+        /// <param name="siteId">Graph site ID for SharePoint site with lists</param>
         public static async Task<CoursesMetadata> LoadTrainingSPData(GraphServiceClient graphClient, string siteId)
         {
             try
@@ -61,10 +70,10 @@ namespace TrainingOnboarding.Models
                     .Request()
                     .GetAsync();
 
-                var coursesList = allLists.Where(l => l.Name == "Courses").SingleOrDefault();
-                var courseAttendanceList = allLists.Where(l => l.Name == "Course Attendance").SingleOrDefault();
-                var coursesChecklistList = allLists.Where(l => l.Name == "Course Checklist").SingleOrDefault();
-                var checklistConfirmationsList = allLists.Where(l => l.Name == "Checklist Confirmations").SingleOrDefault();
+                var coursesList = allLists.Where(l => l.Name == ModelConstants.ListNameCourses).SingleOrDefault();
+                var courseAttendanceList = allLists.Where(l => l.Name == ModelConstants.ListNameCourseAttendance).SingleOrDefault();
+                var coursesChecklistList = allLists.Where(l => l.Name == ModelConstants.ListNameCourseChecklist).SingleOrDefault();
+                var checklistConfirmationsList = allLists.Where(l => l.Name == ModelConstants.ListNameChecklistConfirmations).SingleOrDefault();
 
                 if (coursesList == null || coursesChecklistList == null || coursesChecklistList == null || checklistConfirmationsList == null)
                 {
@@ -79,8 +88,8 @@ namespace TrainingOnboarding.Models
 
                 await Task.WhenAll(coursesChecklistListTask, coursesListTask, courseAttendanceListTask, checklistConfirmationsListTask);
 
-                var users = await LoadSiteUsers(graphClient, siteId);
-                var data = new CoursesMetadata(coursesListTask.Result, coursesChecklistListTask.Result, courseAttendanceListTask.Result, users, checklistConfirmationsListTask.Result);
+                var siteUsers = await LoadSiteUsers(graphClient, siteId);
+                var data = new CoursesMetadata(coursesListTask.Result, coursesChecklistListTask.Result, courseAttendanceListTask.Result, siteUsers, checklistConfirmationsListTask.Result);
 
                 return data;
             }
@@ -89,7 +98,6 @@ namespace TrainingOnboarding.Models
                 throw ex;
             }
         }
-
 
         static async Task<IListItemsCollectionPage> LoadSiteUsers(GraphServiceClient graphClient, string siteId)
         {
@@ -104,13 +112,15 @@ namespace TrainingOnboarding.Models
             return await graphClient.Sites[siteId].Lists[hiddenUserListId].Items.Request().Expand("fields").GetAsync();
         }
 
+        #endregion
+
         #region Props
 
-        public List<CourseContact> AllUsersAllCourses
+        public List<CourseAttendance> AllUsersAllCourses
         {
             get
             {
-                var l = new List<CourseContact>();
+                var l = new List<CourseAttendance>();
 
                 foreach (var c in Courses)
                 {
@@ -128,26 +138,33 @@ namespace TrainingOnboarding.Models
         }
 
         public List<Course> Courses { get; set; } = new List<Course>();
+
         #endregion
 
+        /// <summary>
+        /// Get outstanding items for all users, all courses.
+        /// </summary>
         public PendingUserActions GetUserActionsWithThingsToDo()
         {
-            return GetUserActionsWithThingsToDo(Courses);       // All
+            return GetUserActionsWithThingsToDo(Courses);       // All courses
         }
+
+        /// <summary>
+        /// Get outstanding items for all users for specific courses.
+        /// </summary>
         public PendingUserActions GetUserActionsWithThingsToDo(List<Course> courseFitler)
         {
             var usersWithStuffToDoStill = new List<PendingUserActionsForCourse>();
-
 
             foreach (var c in Courses.Where(c => courseFitler.Contains(c) && c.Start.HasValue && c.Start.Value > DateTime.Today))
             {
                 foreach (var attendee in c.Attendees)
                 {
-                    var newThingToDo = new PendingUserActionsForCourse { Course = c, User = attendee };
+                    var newThingToDo = new PendingUserActionsForCourse { Course = c, Attendee = attendee };
 
                     foreach (var thingToDo in c.CheckListItems)
                     {
-                        if (!thingToDo.CompletedUsers.Contains(attendee))
+                        if (!thingToDo.CompletedUsers.Contains(attendee.User))
                         {
                             newThingToDo.PendingItems.Add(thingToDo);
                         }

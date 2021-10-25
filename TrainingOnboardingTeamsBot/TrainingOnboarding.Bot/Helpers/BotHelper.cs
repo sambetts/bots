@@ -3,7 +3,6 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
-using ProactiveBot.Bots;
 using ProactiveBot.Models;
 using System;
 using System.Collections.Generic;
@@ -15,7 +14,7 @@ using TrainingOnboarding.Models;
 
 namespace TrainingOnboarding.Bot.Helpers
 {
-    public class BotHelper : BaseHelper
+    public class BotHelper : AuthHelper
     {
         private ILogger<BotHelper> _logger;
         public BotHelper(IConfiguration configuration, BotConversationCache botConversationCache, ILogger<BotHelper> logger)
@@ -46,16 +45,13 @@ namespace TrainingOnboarding.Bot.Helpers
         /// <summary>
         /// App installed for user & now we have a conversation reference to cache for future chat threads.
         /// </summary>
-        /// <param name="activity"></param>
         public async Task AddConversationReference(Activity activity)
         {
-
-            var token = await BaseHelper.GetToken(activity.Conversation.TenantId, MicrosoftAppId, MicrosoftAppPassword);
-            var graphClient = BaseHelper.GetAuthenticatedClient(token);
+            var token = await AuthHelper.GetToken(activity.Conversation.TenantId, MicrosoftAppId, MicrosoftAppPassword);
+            var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
             var conversationReference = activity.GetConversationReference();
             await _conversationCache.AddOrUpdateUserAndConversationId(conversationReference, activity.ServiceUrl, graphClient);
-
         }
 
         public async Task<int> SendNotificationToAllUsersWithCoursesStartingIn(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken, int days)
@@ -67,8 +63,8 @@ namespace TrainingOnboarding.Bot.Helpers
 
             int msgSentCount = 0;
 
-            var token = await BaseHelper.GetToken(turnContext.Activity.Conversation.TenantId, MicrosoftAppId, MicrosoftAppPassword);
-            var graphClient = BaseHelper.GetAuthenticatedClient(token);
+            var token = await AuthHelper.GetToken(turnContext.Activity.Conversation.TenantId, MicrosoftAppId, MicrosoftAppPassword);
+            var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
 
             // Load all course data from lists
@@ -77,9 +73,7 @@ namespace TrainingOnboarding.Bot.Helpers
             var compareDate = DateTime.Now.AddDays(days);
             var coursesStartingInRange = courseInfo.Courses.Where(c => c.Start.HasValue && c.Start.Value < compareDate).ToList();
 
-
             var pendingTrainingActions = courseInfo.GetUserActionsWithThingsToDo();
-
 
             // Send notification to all the members
             foreach (var user in _conversationCache.GetCachedUsers())
@@ -88,7 +82,6 @@ namespace TrainingOnboarding.Bot.Helpers
                 var thisUserPendingActions = pendingTrainingActions.GetActionsByEmail(user.EmailAddress);
                 if (thisUserPendingActions.Actions.Count > 0)
                 {
-
                     var previousConversationReference = new ConversationReference()
                     {
                         ChannelId = CardConstants.TeamsBotFrameworkChannelId,
@@ -96,9 +89,12 @@ namespace TrainingOnboarding.Bot.Helpers
                         ServiceUrl = user.ServiceUrl,
                         Conversation = new ConversationAccount() { Id = user.ConversationId },
                     };
+
                     // Ping an update
                     await turnContext.Adapter.ContinueConversationAsync(MicrosoftAppId, previousConversationReference,
-                        async (turnContext, cancellationToken) => await SendUserTrainingReminders(turnContext, cancellationToken, thisUserPendingActions), cancellationToken);
+                        async (turnContext, cancellationToken) 
+                            => await SendCourseIntroAndTrainingRemindersToUser(user, turnContext, cancellationToken, thisUserPendingActions, graphClient)
+                        , cancellationToken);
                 }
 
                 msgSentCount++;
@@ -107,10 +103,10 @@ namespace TrainingOnboarding.Bot.Helpers
             return msgSentCount;
         }
 
-        internal async Task<PendingUserActions> RemindMyClassMembersWithOutstandingTasks(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+        internal async Task<PendingUserActions> RemindClassMembersWithOutstandingTasks(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            var token = await BaseHelper.GetToken(turnContext.Activity.Conversation.TenantId, MicrosoftAppId, MicrosoftAppPassword);
-            var graphClient = BaseHelper.GetAuthenticatedClient(token);
+            var token = await AuthHelper.GetToken(turnContext.Activity.Conversation.TenantId, MicrosoftAppId, MicrosoftAppPassword);
+            var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
             var conversationReference = turnContext.Activity.GetConversationReference();
 
@@ -119,22 +115,21 @@ namespace TrainingOnboarding.Bot.Helpers
 
             var userTalkingEmail = _conversationCache.GetCachedUsers().Where(u => u.RowKey == conversationReference.User.AadObjectId).SingleOrDefault();
 
-            return await RemindMyClassMembersWithOutstandingTasks(turnContext.Adapter, userTalkingEmail, turnContext.Activity.Conversation.TenantId, cancellationToken);
+            return await RemindClassMembersWithOutstandingTasks(turnContext.Adapter, userTalkingEmail, turnContext.Activity.Conversation.TenantId, cancellationToken);
         }
 
 
-        internal async Task<PendingUserActions> RemindMyClassMembersWithOutstandingTasks(BotAdapter botAdapter, CachedUserData trainer, string tenantId, CancellationToken cancellationToken)
+        internal async Task<PendingUserActions> RemindClassMembersWithOutstandingTasks(BotAdapter botAdapter, CachedUserData trainer, string tenantId, CancellationToken cancellationToken)
         {
-            var token = await BaseHelper.GetToken(tenantId, MicrosoftAppId, MicrosoftAppPassword);
-            var graphClient = BaseHelper.GetAuthenticatedClient(token);
-
+            var token = await AuthHelper.GetToken(tenantId, MicrosoftAppId, MicrosoftAppPassword);
+            var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
             // Load all course data from lists
-            var courseInfo = await CoursesMetadata.LoadTrainingSPData(graphClient, this.SiteId);
+            var allTrainingData = await CoursesMetadata.LoadTrainingSPData(graphClient, this.SiteId);
 
-            var coursesThisUserIsLeading = courseInfo.Courses.Where(c => c.Trainer?.Email?.ToLower() == trainer.EmailAddress.ToLower()).ToList();
+            var coursesThisUserIsLeading = allTrainingData.Courses.Where(c => c.Trainer?.Email?.ToLower() == trainer.EmailAddress.ToLower()).ToList();
 
-            var pendingTrainingActionsForCoursesThisUserIsTeaching = courseInfo.GetUserActionsWithThingsToDo(coursesThisUserIsLeading);
+            var pendingTrainingActionsForCoursesThisUserIsTeaching = allTrainingData.GetUserActionsWithThingsToDo(coursesThisUserIsLeading);
 
             if (pendingTrainingActionsForCoursesThisUserIsTeaching.Actions.Count > 0)
             {
@@ -153,9 +148,9 @@ namespace TrainingOnboarding.Bot.Helpers
                             Conversation = new ConversationAccount() { Id = user.ConversationId },
                         };
 
-                        // Ping an update
+                        // Ping an update for each course they're on
                         await botAdapter.ContinueConversationAsync(MicrosoftAppId, previousConversationReference,
-                            async (turnContext, cancellationToken) => await SendUserTrainingReminders(turnContext, cancellationToken, thisUserPendingActions), cancellationToken);
+                            async (turnContext, cancellationToken) => await SendCourseIntroAndTrainingRemindersToUser(user, turnContext, cancellationToken, thisUserPendingActions, graphClient), cancellationToken);
                     }
 
                 }
@@ -164,24 +159,38 @@ namespace TrainingOnboarding.Bot.Helpers
             return pendingTrainingActionsForCoursesThisUserIsTeaching;
         }
 
-        public async Task SendUserTrainingReminders(ITurnContext turnContext, CancellationToken cancellationToken, PendingUserActions thisUserPendingActions)
+        public async Task SendCourseIntroAndTrainingRemindersToUser(CachedUserData user, ITurnContext turnContext, CancellationToken cancellationToken, PendingUserActions thisUserPendingActions, GraphServiceClient graphClient)
         {
+            await turnContext.SendActivityAsync($"Hello! You have {thisUserPendingActions.Actions.SelectMany(a => a.PendingItems).Count()} training actions to complete.");
+
+            // Send seperate card for each course with outstanding items
             foreach (var course in thisUserPendingActions.UniqueCourses)
             {
-                var listCardAttachment = LearningPlanListCard.GetLearningPlanListCard(thisUserPendingActions.Actions.Where(a=> a.Course == course),
-                    !string.IsNullOrEmpty(course.WelcomeMessage) ? course.WelcomeMessage : "Your outstanding training tasks", AppBaseUri);
-                await turnContext.SendActivityAsync(MessageFactory.Attachment(listCardAttachment));
-            }
+                // Get attendee info
+                var attendeeInfoForCourse = thisUserPendingActions.Actions.Where(a=> a.Course == course).Select(a => a.Attendee).Where(a => a.User.Email == user.EmailAddress).FirstOrDefault();
+                
+                // Send course intro?
+                if (!attendeeInfoForCourse.BotContacted)
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Attachment(LearningPlanListCard.GetCourseWelcome(course)), cancellationToken);
+                    
+                    // Don't send twice
+                    await attendeeInfoForCourse.SaveChanges(graphClient, this.SiteId);
+                }
 
-            await turnContext.SendActivityAsync($"You have {thisUserPendingActions.Actions.SelectMany(a=> a.PendingItems).Count()} training actions to complete.");
-            Console.WriteLine("Sent training reminders");
+                // Send outstanding course actions
+                var actionsForCourse = thisUserPendingActions.Actions.Where(a => a.Course == course);
+                var listCardAttachment = LearningPlanListCard.GetLearningPlanListCard(actionsForCourse, course);
+
+                await turnContext.SendActivityAsync(MessageFactory.Attachment(listCardAttachment), cancellationToken);
+            }
         }
 
-        public async Task<InstallationCounts> InstallBotForCourseMembersAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+        public async Task<InstallationCounts> InstallBotForCourseMembersAsync(string tenantId)
         {
 
-            var token = await BaseHelper.GetToken(turnContext.Activity.Conversation.TenantId, MicrosoftAppId, MicrosoftAppPassword);
-            var graphClient = BaseHelper.GetAuthenticatedClient(token);
+            var token = await AuthHelper.GetToken(tenantId, MicrosoftAppId, MicrosoftAppPassword);
+            var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
             var courseInfo = await CoursesMetadata.LoadTrainingSPData(graphClient, this.SiteId);
             var memberIdsWithPendingCourse = new List<string>();
@@ -189,7 +198,7 @@ namespace TrainingOnboarding.Bot.Helpers
             // Convert user emails into AAD ids
             foreach (var userOnCourse in courseInfo.AllUsersAllCourses)
             {
-                var usersResult = await graphClient.Users.Request().Filter($"userPrincipalName eq '{userOnCourse.Email}'").GetAsync();
+                var usersResult = await graphClient.Users.Request().Filter($"userPrincipalName eq '{userOnCourse.User.Email}'").GetAsync();
                 memberIdsWithPendingCourse.Add(usersResult.FirstOrDefault().Id);
             }
 
@@ -204,7 +213,7 @@ namespace TrainingOnboarding.Bot.Helpers
                 {
                     // Perform installation for all the member whose conversation reference is not available.
                     await InstallTrainingBotForTarget(memberIdWithPendingCourse,
-                        turnContext.Activity.Conversation.TenantId,
+                        tenantId,
                         MicrosoftAppId,
                         MicrosoftAppPassword,
                         AppCatalogTeamAppId);

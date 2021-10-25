@@ -4,7 +4,6 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
-using ProactiveBot.Bots;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +43,9 @@ namespace TrainingOnboarding.Bot.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+#if DEBUG
+            return;     // Just aint got time for dat
+#endif
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
@@ -51,7 +53,7 @@ namespace TrainingOnboarding.Bot.Services
                     var currentDateTime = DateTime.UtcNow;
                     Console.WriteLine($"Training bot Hosted Service is running at: {currentDateTime}.");
 
-                    await this.CheckTrainingPlans();
+                    await this.InstallAppAndCheckTrainingPlans();
                 }
 #pragma warning disable CA1031 // Catching general exceptions that might arise during execution to avoid blocking next run.
                 catch (Exception ex)
@@ -68,12 +70,14 @@ namespace TrainingOnboarding.Bot.Services
         }
 
 
-        private async Task CheckTrainingPlans()
+        private async Task InstallAppAndCheckTrainingPlans()
         {
 
-            var token = await BaseHelper.GetToken(TenantId, MicrosoftAppId, MicrosoftAppPassword);
-            var graphClient = BaseHelper.GetAuthenticatedClient(token);
+            var token = await AuthHelper.GetToken(TenantId, MicrosoftAppId, MicrosoftAppPassword);
+            var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
+            // Install bot app for anyone on a course
+            var result = await _helper.InstallBotForCourseMembersAsync(this.TenantId);
 
             // Load all course data from lists
             var courseInfo = await CoursesMetadata.LoadTrainingSPData(graphClient, this.SiteId);
@@ -98,11 +102,12 @@ namespace TrainingOnboarding.Bot.Services
                         ServiceUrl = user.ServiceUrl,
                         Conversation = new ConversationAccount() { Id = user.ConversationId },
                     };
+
                     // Ping an update
                     await ((BotFrameworkAdapter)this._adapter).ContinueConversationAsync(MicrosoftAppId, previousConversationReference,
-                        async (turnContext, cancellationToken) => await _helper.SendUserTrainingReminders(turnContext, cancellationToken, thisUserPendingActions), default);
-
-
+                        async (turnContext, cancellationToken) => 
+                            await _helper.SendCourseIntroAndTrainingRemindersToUser(user, turnContext, cancellationToken, thisUserPendingActions, graphClient), 
+                        default);
                 }
 
             }

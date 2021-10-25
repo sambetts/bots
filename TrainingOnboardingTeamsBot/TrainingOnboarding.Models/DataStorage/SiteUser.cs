@@ -6,10 +6,10 @@ using System.Text;
 namespace TrainingOnboarding.Models
 {
 
-    public class CourseContact : BaseSPItem
+    public class SiteUser : BaseSPItem
     {
-
-        public CourseContact(ListItem courseItem) : base(courseItem)
+        public SiteUser() { }
+        public SiteUser(ListItem courseItem) : base(courseItem)
         {
             this.Name = courseItem.Fields.AdditionalData["Title"]?.ToString();
             this.Email = courseItem.Fields.AdditionalData.ContainsKey("EMail") ? courseItem.Fields.AdditionalData["EMail"]?.ToString() : string.Empty;

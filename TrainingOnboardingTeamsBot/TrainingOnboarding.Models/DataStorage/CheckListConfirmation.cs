@@ -8,9 +8,9 @@ namespace TrainingOnboarding.Models
 
     public class CheckListConfirmation : BaseSPItemWithUser
     {
-        public CheckListConfirmation(ListItem item, List<CourseContact> allUsers) : base(item, allUsers, "DoneByLookupId")
+        public CheckListConfirmation(ListItem item, List<SiteUser> allUsers) : base(item, allUsers, "DoneByLookupId")
         {
-            this.CheckListItemId = item.Fields.AdditionalData["Title"]?.ToString();
+            this.CheckListItemId = GetFieldValue(item, "CheckListID");
         }
 
         public string CheckListItemId { get; set; }

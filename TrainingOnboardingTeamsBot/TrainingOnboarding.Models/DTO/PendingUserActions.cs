@@ -5,22 +5,24 @@ using System.Text;
 
 namespace TrainingOnboarding.Models
 {
-
+    /// <summary>
+    /// Outstanding tasks for all users/course. Generated from a CoursesMetadata.
+    /// </summary>
     public class PendingUserActions
     {
         public List<PendingUserActionsForCourse> Actions { get; set; } = new List<PendingUserActionsForCourse>();
 
 
-        public List<CourseContact> UniqueUsers
+        public List<CourseAttendance> UniqueUsers
         { 
             get 
             {
-                var list = new List<CourseContact>();
+                var list = new List<CourseAttendance>();
                 foreach (var item in Actions)
                 {
-                    if (!list.Contains(item.User))
+                    if (!list.Contains(item.Attendee))
                     {
-                        list.Add(item.User);
+                        list.Add(item.Attendee);
                     }
                 }
                 return list;
@@ -44,7 +46,7 @@ namespace TrainingOnboarding.Models
         }
         public PendingUserActions GetActionsByEmail(string email)
         {
-            return new PendingUserActions { Actions = Actions.Where(a => a.User.Email.ToLower() == email.ToLower()).ToList() };
+            return new PendingUserActions { Actions = Actions.Where(a => a.Attendee.User.Email.ToLower() == email.ToLower()).ToList() };
         }
     }
 
@@ -52,7 +54,7 @@ namespace TrainingOnboarding.Models
     public class PendingUserActionsForCourse
     {
         public Course Course { get; set; }
-        public CourseContact User { get; set; }
+        public CourseAttendance Attendee { get; set; }
         public List<CheckListItem> PendingItems { get; set; } = new List<CheckListItem>();
     }
 }

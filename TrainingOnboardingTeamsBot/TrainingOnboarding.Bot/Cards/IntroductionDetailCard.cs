@@ -20,7 +20,7 @@ namespace TrainingOnboarding.Bot.Cards
         /// <param name="localizer">The current culture's string localizer.</param>
         /// <param name="introductionEntity">Introduction entity.</param>
         /// <returns>Introduction detail card attachment.</returns>
-        public static Attachment GetCard(string applicationBasePath, IEnumerable<Models.Course> courses)
+        public static Attachment GetCard(string applicationBasePath)
         {
 
             var card = new AdaptiveCard(new AdaptiveSchemaVersion(CardConstants.AdaptiveCardVersion))
@@ -39,24 +39,10 @@ namespace TrainingOnboarding.Bot.Cards
                 {
                     Weight = AdaptiveTextWeight.Bolder,
                     Spacing = AdaptiveSpacing.Medium,
-                    Text = "Hi, I'm the training onboarding bot. You are scheduled on the following courses and have pre-training tasks to complete:",
+                    Text = "Hi, I'm the training onboarding bot. You are scheduled on one or more courses - please take time to prepare",
                     Wrap = true,
                 });
 
-            int i = 1;
-            foreach (var course in courses)
-            {
-                card.Body.Add(
-                new AdaptiveTextBlock
-                {
-                    Weight = AdaptiveTextWeight.Bolder,
-                    Spacing = AdaptiveSpacing.Medium,
-                    Text = $"{i}. {course.Name} starting {course.Start.Value.ToLongDateString()}, with {course.CheckListItems.Count} item(s) to complete beforehand.",
-                    Wrap = true,
-                });
-
-                i++;
-            }
 
             return new Attachment
             {

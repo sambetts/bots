@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrainingOnboarding.Bot", "T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrainingOnboarding.Models", "TrainingOnboarding.Models\TrainingOnboarding.Models.csproj", "{CCCDDF46-25AC-4B02-A207-F94ABF463AB9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingOnboarding.Tests", "TrainingOnboarding.Tests\TrainingOnboarding.Tests.csproj", "{AEE4EA32-B5C0-44C0-AA5A-14B90CFEAC17}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{CCCDDF46-25AC-4B02-A207-F94ABF463AB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCCDDF46-25AC-4B02-A207-F94ABF463AB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCCDDF46-25AC-4B02-A207-F94ABF463AB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEE4EA32-B5C0-44C0-AA5A-14B90CFEAC17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEE4EA32-B5C0-44C0-AA5A-14B90CFEAC17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEE4EA32-B5C0-44C0-AA5A-14B90CFEAC17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEE4EA32-B5C0-44C0-AA5A-14B90CFEAC17}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

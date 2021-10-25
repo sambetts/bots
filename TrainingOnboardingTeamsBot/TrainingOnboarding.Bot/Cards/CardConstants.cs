@@ -10,6 +10,10 @@ namespace TrainingOnboarding.Bot.Cards
     /// </summary>
     public static class CardConstants
     {
+        public const string CardActionPropName = "action";
+        public const string CardActionValLearnerTasksDone = "LearnerTasksDone";
+
+
         /// <summary>
         /// Describes adaptive card version to be used. Version can be upgraded or changed using this value.
         /// </summary>

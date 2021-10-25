@@ -8,7 +8,7 @@ namespace TrainingOnboarding.Models
 
     public class Course : BaseSPItemWithUser
     {
-        public Course(ListItem courseItem, List<CourseContact> allUsers) : base(courseItem, allUsers, "TrainerLookupId")
+        public Course(ListItem courseItem, List<SiteUser> allUsers) : base(courseItem, allUsers, "TrainerLookupId")
         {
             this.Name = courseItem.Fields.AdditionalData["Title"]?.ToString();
             this.WelcomeMessage = courseItem.Fields.AdditionalData.ContainsKey("WelcomeMessage") ? courseItem.Fields.AdditionalData["WelcomeMessage"]?.ToString() : string.Empty;
@@ -25,12 +25,12 @@ namespace TrainingOnboarding.Models
             }
         }
 
-        public CourseContact Trainer => base.User;
+        public SiteUser Trainer => base.User;
         public DateTime? Start { get; set; }
         public string Name { get; set; }
         public string WelcomeMessage { get; set; }
         public List<CheckListItem> CheckListItems { get; set; } = new List<CheckListItem>();
-        public List<CourseContact> Attendees { get; set; } = new List<CourseContact>();
+        public List<CourseAttendance> Attendees { get; set; } = new List<CourseAttendance>();
 
     }
 }
