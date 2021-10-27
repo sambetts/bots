@@ -120,13 +120,4 @@ namespace TrainingOnboarding.Bot
         public string ConversationId { get; set; }
         public string EmailAddress { get; set; }
     }
-
-    //public class ConversationInfo
-    //{
-    //    [JsonProperty(PropertyName = "conversationReference")]
-    //    public ConversationReference ConversationReference { get; set; }
-
-    //    [JsonProperty(PropertyName = "timestamp")]
-    //    public DateTimeOffset Timestamp { get; set; }
-    //}
 }
