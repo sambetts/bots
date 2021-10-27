@@ -19,21 +19,17 @@ namespace Microsoft.BotBuilderSamples
     public class Startup
     {
         // This method gets called by the runtime. Use this method to add services to the container.
-        public IConfigurationRoot Configuration { get; set; }
+        public IConfiguration Configuration { get; set; }
 
-        public Startup(IWebHostEnvironment env)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
         public void ConfigureServices(IServiceCollection services)
         {
-
-            services.AddApplicationInsightsTelemetry(
-                Configuration["APPINSIGHTS_CONNECTIONSTRING"]);
+            var config = new BotConfig(Configuration);
+            services.AddSingleton(config);
+            services.AddApplicationInsightsTelemetry(config.AppInsights);
 
             services.AddControllersWithViews();
 
@@ -45,7 +41,6 @@ namespace Microsoft.BotBuilderSamples
             // Create a global hashset for our ConversationReferences
             services.AddSingleton<BotHelper>();
 
-            var storageConnectionString = Configuration["StorageConnectionString"];
             services.AddSingleton<BotConversationCache>();
 
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.

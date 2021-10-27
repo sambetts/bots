@@ -8,12 +8,21 @@ namespace TrainingOnboarding.Models
 
     public class Course : BaseSPItemWithUser
     {
+        public Course()
+        { 
+        }
+
         public Course(ListItem courseItem, List<SiteUser> allUsers) : base(courseItem, allUsers, "TrainerLookupId")
         {
-            this.Name = courseItem.Fields.AdditionalData["Title"]?.ToString();
-            this.WelcomeMessage = courseItem.Fields.AdditionalData.ContainsKey("WelcomeMessage") ? courseItem.Fields.AdditionalData["WelcomeMessage"]?.ToString() : string.Empty;
+            this.Name = base.GetFieldValue(courseItem, "Title");
+            this.WelcomeMessage = base.GetFieldValue(courseItem, "WelcomeMessage");
+            
+            var daysBeforeToSendRemindersString = base.GetFieldValue(courseItem, "DaysBeforeToSendReminders");
+            var days = 3;       // Default 3 days
+            int.TryParse(daysBeforeToSendRemindersString, out days);
+            this.DaysBeforeToSendReminders = days;
 
-            var startString = courseItem.Fields.AdditionalData.ContainsKey("Start") ? courseItem.Fields.AdditionalData["Start"]?.ToString() : string.Empty;
+            var startString = base.GetFieldValue(courseItem, "Start");
             var dt = DateTime.MinValue;
             if (DateTime.TryParse(startString, out dt))
             {
@@ -31,6 +40,6 @@ namespace TrainingOnboarding.Models
         public string WelcomeMessage { get; set; }
         public List<CheckListItem> CheckListItems { get; set; } = new List<CheckListItem>();
         public List<CourseAttendance> Attendees { get; set; } = new List<CourseAttendance>();
-
+        public int DaysBeforeToSendReminders { get; set; }
     }
 }

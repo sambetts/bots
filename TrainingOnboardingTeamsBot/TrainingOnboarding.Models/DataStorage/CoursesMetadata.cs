@@ -13,6 +13,10 @@ namespace TrainingOnboarding.Models
     {
         #region Constructor & Loaders
 
+        public CoursesMetadata()
+        { 
+        }
+
         /// <summary>
         /// Load from SharePoint list results
         /// </summary>
@@ -144,19 +148,32 @@ namespace TrainingOnboarding.Models
         /// <summary>
         /// Get outstanding items for all users, all courses.
         /// </summary>
-        public PendingUserActions GetUserActionsWithThingsToDo()
+        public PendingUserActions GetUserActionsWithThingsToDo(bool filterByCourseReminderDays)
         {
-            return GetUserActionsWithThingsToDo(Courses);       // All courses
+            return GetUserActionsWithThingsToDo(Courses, filterByCourseReminderDays);       // All courses
         }
 
         /// <summary>
         /// Get outstanding items for all users for specific courses.
         /// </summary>
-        public PendingUserActions GetUserActionsWithThingsToDo(List<Course> courseFitler)
+        public PendingUserActions GetUserActionsWithThingsToDo(List<Course> courseFitler, bool filterByCourseReminderDays)
         {
             var usersWithStuffToDoStill = new List<PendingUserActionsForCourse>();
 
-            foreach (var c in Courses.Where(c => courseFitler.Contains(c) && c.Start.HasValue && c.Start.Value > DateTime.Today))
+            // Look for courses that are in range
+            IEnumerable<Course> courses = null;
+            if (!filterByCourseReminderDays)
+            {
+                // Just get courses that haven't started yet
+                courses = Courses.Where(c => courseFitler.Contains(c) && c.Start.HasValue && c.Start.Value > DateTime.Today);
+            }
+            else
+            {
+                // Get courses that fall in the "days before course start" reminder
+                courses = Courses.Where(c => courseFitler.Contains(c) && c.Start.HasValue && c.Start.Value < DateTime.Now.AddDays(c.DaysBeforeToSendReminders));
+            }
+
+            foreach (var c in courses)
             {
                 foreach (var attendee in c.Attendees)
                 {

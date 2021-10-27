@@ -1,7 +1,6 @@
 ﻿using Azure;
 using Azure.Data.Tables;
 using Microsoft.Bot.Schema;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
 using System;
 using System.Collections.Concurrent;
@@ -14,17 +13,15 @@ namespace TrainingOnboarding.Bot
     public class BotConversationCache
     {
         const string TABLE_NAME = "ConversationCache";
-        public BotConversationCache(IConfiguration configuration)
+        public BotConversationCache(BotConfig config)
         {
             this.TableClient = new TableClient(
-                configuration["StorageConnectionString"],
+                config.Storage,
                 TABLE_NAME);
 
             TableClient.CreateIfNotExists();
 
-            var botId = configuration["AppCatalogTeamAppId"];
-
-            var queryResultsFilter = TableClient.Query<CachedUserData>(filter: $"PartitionKey eq '{CachedUserData.PartitionKeyVal}'");
+            var queryResultsFilter = TableClient.Query<CachedUserAndConversationData>(filter: $"PartitionKey eq '{CachedUserAndConversationData.PartitionKeyVal}'");
             foreach (var qEntity in queryResultsFilter)
             {
                 _userIdConversationCache.AddOrUpdate(qEntity.RowKey, qEntity, (key, newValue) => qEntity);
@@ -33,23 +30,23 @@ namespace TrainingOnboarding.Bot
 
         }
 
-        private ConcurrentDictionary<string, CachedUserData> _userIdConversationCache = new ConcurrentDictionary<string, CachedUserData>();
+        private ConcurrentDictionary<string, CachedUserAndConversationData> _userIdConversationCache = new ConcurrentDictionary<string, CachedUserAndConversationData>();
 
         private TableClient TableClient { get; set; }
         public int RefrenceCount => _userIdConversationCache.Count;
 
         internal async Task AddOrUpdateUserAndConversationId(ConversationReference conversationReference, string serviceUrl, GraphServiceClient graphClient)
         {
-            CachedUserData u = null; 
+            CachedUserAndConversationData u = null; 
             if (!_userIdConversationCache.TryGetValue(conversationReference.User.AadObjectId, out u))
             {
 
                 // Have not got in memory cache
 
-                Response<CachedUserData> entityResponse = null;
+                Response<CachedUserAndConversationData> entityResponse = null;
                 try
                 {
-                    entityResponse = TableClient.GetEntity<CachedUserData>(CachedUserData.PartitionKeyVal, conversationReference.User.Id);
+                    entityResponse = TableClient.GetEntity<CachedUserAndConversationData>(CachedUserAndConversationData.PartitionKeyVal, conversationReference.User.Id);
                 }
                 catch (RequestFailedException ex)
                 {
@@ -68,7 +65,7 @@ namespace TrainingOnboarding.Bot
                     var user = await graphClient.Users[conversationReference.User.AadObjectId].Request().GetAsync();
 
                     // Not in storage account either. Add there
-                    u = new CachedUserData() 
+                    u = new CachedUserAndConversationData() 
                     { 
                         RowKey = conversationReference.User.AadObjectId, 
                         ServiceUrl = serviceUrl, 
@@ -88,12 +85,12 @@ namespace TrainingOnboarding.Bot
         }
 
 
-        public List<CachedUserData> GetCachedUsers()
+        public List<CachedUserAndConversationData> GetCachedUsers()
         {
             return _userIdConversationCache.Values.ToList();
         }
 
-        internal CachedUserData GetCachedUser(string aadObjectId)
+        internal CachedUserAndConversationData GetCachedUser(string aadObjectId)
         {
             return _userIdConversationCache.Values.Where(u=> u.RowKey == aadObjectId).SingleOrDefault();
         }
@@ -104,13 +101,16 @@ namespace TrainingOnboarding.Bot
         }
     }
 
-    public class CachedUserData : ITableEntity
+    /// <summary>
+    /// Table storage or memory cache for user
+    /// </summary>
+    public class CachedUserAndConversationData : ITableEntity
     {
         public static string PartitionKeyVal => "Users";
         public string PartitionKey { get => PartitionKeyVal; set { return; } }
         public string RowKey { get; set; }
         public DateTimeOffset? Timestamp { get; set; }
-        public Azure.ETag ETag { get; set; }
+        public ETag ETag { get; set; }
 
         /// <summary>
         /// Gets or sets service URL.

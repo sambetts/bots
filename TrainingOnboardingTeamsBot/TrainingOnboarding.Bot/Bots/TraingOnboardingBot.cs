@@ -47,22 +47,9 @@ namespace TrainingOnboarding.Bot
 
         private async Task HandleUserTextChat(string text, ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            if (text.Contains("install"))
+            if (text.Contains("remind"))
             {
-                // This happens in CourseChecklistReminderService too
-                var result = await _helper.InstallBotForCourseMembersAsync(turnContext.Activity.Conversation.TenantId);
-                await turnContext.SendActivityAsync(MessageFactory.Text($"Existing: {result.Existing} \n\n Newly Installed: {result.New}"), cancellationToken);
-            }
-            else if (text.Contains("send"))
-            {
-                // This needs moving
-                int days = 31;
-                var count = await _helper.SendNotificationToAllUsersWithCoursesStartingIn(turnContext, cancellationToken, days);
-                await turnContext.SendActivityAsync(MessageFactory.Text($"Message sent: {count}"), cancellationToken);
-            }
-            else if (text.Contains("remind"))
-            {
-                var coursesFound = await _helper.RemindClassMembersWithOutstandingTasks(turnContext, cancellationToken);
+                var coursesFound = await _helper.RemindClassMembersWithOutstandingTasks(turnContext, cancellationToken, false);
 
                 await turnContext.SendActivityAsync(MessageFactory.Text(
                     $"Found {coursesFound.Actions.Count} outstanding action(s) for {coursesFound.UniqueUsers.Count} user(s), " +
@@ -153,7 +140,7 @@ namespace TrainingOnboarding.Bot
 
                     // Now figure out if user needs to do something
                     var user = _conversationCache.GetCachedUser(turnContext.Activity.GetConversationReference().User.AadObjectId);
-                    var pendingTrainingActions = courseInfo.GetUserActionsWithThingsToDo().GetActionsByEmail(user.EmailAddress);
+                    var pendingTrainingActions = courseInfo.GetUserActionsWithThingsToDo(true).GetActionsByEmail(user.EmailAddress);
 
                     // Send bot intro if they're on a course
                     if (pendingTrainingActions.Actions.Count > 0)

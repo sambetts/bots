@@ -8,6 +8,9 @@ namespace TrainingOnboarding.Models
 
     public class CheckListItem : BaseSPItem
     {
+        public CheckListItem()
+        { 
+        }
         public CheckListItem(ListItem item) : base(item)
         {
             this.CourseID = base.GetFieldValue(item, "CourseID");
