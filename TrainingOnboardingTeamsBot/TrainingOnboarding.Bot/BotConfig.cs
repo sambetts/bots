@@ -20,7 +20,6 @@ namespace TrainingOnboarding.Bot
             this.MicrosoftAppId = configuration["MicrosoftAppId"];
             this.MicrosoftAppPassword = configuration["MicrosoftAppPassword"];
             this.AppCatalogTeamAppId = configuration["AppCatalogTeamAppId"];
-            this.SiteId = configuration["SharePointSiteId"];
         }
 
         public string AppInsights { get; set; }
@@ -30,7 +29,6 @@ namespace TrainingOnboarding.Bot
         public string AppBaseUri { get; set; }
         public string MicrosoftAppId { get; set; }
         public string MicrosoftAppPassword { get; set; }
-        public string SiteId { get; set; }
         public string TenantId { get; set; }
     }
 }

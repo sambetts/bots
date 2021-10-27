@@ -17,13 +17,12 @@ namespace TrainingOnboarding.Models
             this.CourseId = GetFieldValue(item, "CourseattendanceID");
             this.QACountry = GetFieldValue(item, "QACountry");
             this.QARole = GetFieldValue(item, "QARole");
+            this.QAOrg = GetFieldValue(item, "QAOrg");
             this.QASpareTimeActivities = GetFieldValue(item, "QASpareTimeActivities");
             this.QAMobilePhoneNumber = GetFieldValue(item, "QAMobileNumber");
 
-            var b = GetFieldValue(item, "BotContacted");
-            var contacted = false;
-            bool.TryParse(b, out contacted);
-            this.BotContacted = contacted;
+            this.IntroductionDone = GetFieldBool(item, "IntroductionDone");
+            this.BotContacted = GetFieldBool(item, "BotContacted");
         }
 
         #region Props
@@ -32,9 +31,12 @@ namespace TrainingOnboarding.Models
 
         public string QACountry { get; set; }
         public string QARole { get; set; }
+        public string QAOrg { get; set; }
         public string QASpareTimeActivities { get; set; }
         public string QAMobilePhoneNumber { get; set; }
         public bool BotContacted { get; set; }
+
+        public bool IntroductionDone { get; set; }
 
         #endregion
 
@@ -85,12 +87,27 @@ namespace TrainingOnboarding.Models
                                     {"QARole", this.QARole},
                                     {"QASpareTimeActivities", this.QASpareTimeActivities},
                                     {"QAMobilePhoneNumber", this.QAMobilePhoneNumber},
-                                    {"BotContacted", this.BotContacted}
+                                    {"BotContacted", this.BotContacted},
+                                    {"IntroductionDone", this.IntroductionDone}
                                 }
                             }
                         });
 
         }
 
+        public static async Task<CourseAttendance> LoadById(GraphServiceClient graphClient, string siteId, string sPID)
+        {
+            var allLists = await graphClient.Sites[siteId]
+                                .Lists
+                                .Request()
+                                .GetAsync();
+
+            var coursesList = allLists.Where(l => l.Name == ModelConstants.ListNameCourses).SingleOrDefault();
+            var courseAttendanceList = allLists.Where(l => l.Name == ModelConstants.ListNameCourseAttendance).SingleOrDefault();
+            var courseAttendanceItem = await graphClient.Sites[siteId].Lists[courseAttendanceList.Id].Items[sPID].Request().Expand("fields").GetAsync();
+            var allUsers = await CoursesMetadata.LoadSiteUsers(graphClient, siteId);
+
+            return new CourseAttendance(courseAttendanceItem, allUsers);
+        }
     }
 }

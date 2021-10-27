@@ -118,11 +118,20 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="AttendeeFixedQuestionsInput" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cards\templates\attendeefixedquestionsinput.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="AttendeeFixedQuestionsPublication" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cards\templates\attendeefixedquestionspublication.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
   <data name="BotIntroduction" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\cards\templates\botintroduction.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="CourseWelcome" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Cards\Templates\CourseWelcome.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="IntroduceYourself" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cards\templates\introduceyourself.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="LearnerQuestions" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Cards\Templates\LearnerQuestions.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>

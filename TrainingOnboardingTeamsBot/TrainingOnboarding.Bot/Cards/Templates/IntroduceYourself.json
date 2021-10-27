@@ -1,0 +1,25 @@
+{
+    "type": "AdaptiveCard",
+    "version": "1.3",
+    "body": [
+        {
+            "type": "TextBlock",
+            "text": "Meet and greet your colleagues in the program",
+            "wrap": true
+        },
+        {
+            "type": "ActionSet",
+            "actions": [
+              {
+                "type": "Action.Submit",
+                "title": "Introduce Yourself",
+                "data": {
+                  "action": "StartIntroduction",
+                  "SPID": "${SharePointId}"
+                }
+              }
+            ]
+        }
+    ],
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
+}

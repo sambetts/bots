@@ -12,11 +12,26 @@ namespace TrainingOnboarding.Bot.Cards
     {
         public static string FIELD_NAME_BOT_NAME => "${BotName}";
         public static string FIELD_NAME_TRAINER_NAME => "${TrainerName}";
+        public static string FIELD_NAME_ATTENDEE_NAME => "${AttendeeName}";
+        public static string FIELD_NAME_ATTENDEE_EMAIL => "${AttendeeEmail}";
         public static string FIELD_NAME_COURSE_NAME => "${CourseName}";
         public static string FIELD_NAME_COURSE_INTRO_TEXT => "${CourseIntroduction}";
 
+        public static string FIELD_NAME_SHAREPOINT_ID => "${SharePointId}";
+
+
+        public static string FIELD_NAME_QARole => "${QARole}";
+        public static string FIELD_NAME_QAOrg => "${QAOrg}";
+        public static string FIELD_NAME_QACountry => "${QACountry}";
+        public static string FIELD_NAME_QASpareTimeActivities => "${QASpareTimeActivities}";
+        public static string FIELD_NAME_QAMobilePhoneNumber => "${QAMobilePhoneNumber}";
+
+
         public const string CardActionPropName = "action";
+        public const string CardSharePointIdPropName = "SPID";
         public const string CardActionValLearnerTasksDone = "LearnerTasksDone";
+        public const string CardActionValStartIntroduction = "StartIntroduction";
+        public const string CardActionValSaveIntroductionQuestions = "SaveIntroductionQuestions";
 
 
         /// <summary>

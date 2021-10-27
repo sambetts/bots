@@ -1,13 +1,65 @@
-﻿using Microsoft.Graph;
+﻿using Microsoft.Bot.Builder;
+using Microsoft.Graph;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TrainingOnboarding.Models
 {
     public class CourseTasksUpdateInfo
     {
+        public CourseTasksUpdateInfo() { }
+        public CourseTasksUpdateInfo(string json, string userAadObjectId) 
+        {
+            this.UserAadObjectId = userAadObjectId;
+
+            // Enum the JSon dynamically to discover properties
+            var d = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(json);
+            foreach (var item in d)
+            {
+                if (item.Key != null && item.Key.StartsWith("chk-"))
+                {
+                    var requirementdIdString = item.Key.TrimStart("chk-".ToCharArray());
+                    var requirementdId = 0;
+                    var done = false;
+                    bool.TryParse(item.Value, out done);
+                    int.TryParse(requirementdIdString, out requirementdId);
+                    if (done && requirementdId != 0)
+                    {
+                        this.ConfirmedTaskIds.Add(requirementdId);
+                    }
+                }
+            }
+
+            
+        }
+
+        public async Task SendReply(ITurnContext<Microsoft.Bot.Schema.IMessageActivity> turnContext, CancellationToken cancellationToken, string appId, string appPassword, string siteId)
+        {
+            if (this.HasChanges)
+            {
+                var token = await AuthHelper.GetToken(turnContext.Activity.Conversation.TenantId, appId, appPassword);
+                var graphClient = AuthHelper.GetAuthenticatedClient(token);
+
+                // Save to SP list
+                var updateCount = await this.SaveChanges(graphClient, siteId);
+
+                await turnContext.SendActivityAsync(MessageFactory.Text(
+                    $"Updated {updateCount} tasks as complete - thanks for getting ready!"
+                ), cancellationToken);
+            }
+            else
+            {
+
+                await turnContext.SendActivityAsync(MessageFactory.Text(
+                    $"Nothing finished from this list?"
+                ), cancellationToken);
+            }
+        }
+
         public bool HasChanges => this.ConfirmedTaskIds.Count > 0;
 
         public List<int> ConfirmedTaskIds { get; set; } = new List<int>();

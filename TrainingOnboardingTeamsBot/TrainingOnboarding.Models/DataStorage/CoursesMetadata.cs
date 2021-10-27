@@ -21,13 +21,8 @@ namespace TrainingOnboarding.Models
         /// Load from SharePoint list results
         /// </summary>
         public CoursesMetadata(IListItemsCollectionPage coursesListItems, IListItemsCollectionPage coursesChecklistListItems,
-            IListItemsCollectionPage courseAttendanceList, IListItemsCollectionPage siteUsers, IListItemsCollectionPage checklistConfirmationsList)
+            IListItemsCollectionPage courseAttendanceList, List<SiteUser> allUsers, IListItemsCollectionPage checklistConfirmationsList)
         {
-            var allUsers = new List<SiteUser>();
-            foreach (var item in siteUsers)
-            {
-                allUsers.Add(new SiteUser(item));
-            }
 
             var allAttendanceItems = new List<CourseAttendance>();
             foreach (var item in courseAttendanceList)
@@ -103,7 +98,7 @@ namespace TrainingOnboarding.Models
             }
         }
 
-        static async Task<IListItemsCollectionPage> LoadSiteUsers(GraphServiceClient graphClient, string siteId)
+        public static async Task<List<SiteUser>> LoadSiteUsers(GraphServiceClient graphClient, string siteId)
         {
 
             var hiddenUserListId = (await graphClient
@@ -113,7 +108,17 @@ namespace TrainingOnboarding.Models
                             .Filter("displayName eq 'User Information List'")
                             .GetAsync())[0].Id;
 
-            return await graphClient.Sites[siteId].Lists[hiddenUserListId].Items.Request().Expand("fields").GetAsync();
+
+
+            var userItems = await graphClient.Sites[siteId].Lists[hiddenUserListId].Items.Request().Expand("fields").GetAsync();
+
+            var allUsers = new List<SiteUser>();
+            foreach (var item in userItems)
+            {
+                allUsers.Add(new SiteUser(item));
+            }
+
+            return allUsers;
         }
 
         #endregion

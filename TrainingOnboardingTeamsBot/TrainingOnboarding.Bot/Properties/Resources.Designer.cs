@@ -71,6 +71,70 @@ namespace TrainingOnboarding.Bot.Properties {
         ///        {
         ///          &quot;type&quot;: &quot;Column&quot;,
         ///          &quot;width&quot;: &quot;auto&quot;,
+        ///          &quot;items&quot;: [
+        ///            {
+        ///              &quot;type&quot;: &quot;TextBlock&quot;,
+        ///              &quot;text&quot;: &quot;Introduction&quot;,
+        ///              &quot;wrap&quot;: true
+        ///            }
+        ///          ],
+        ///          &quot;spacing&quot;: &quot;None&quot;
+        ///        }
+        ///      ]
+        ///    },
+        ///    {
+        ///      &quot;type&quot;: &quot;TextBlock&quot;,
+        ///      &quot;text&quot;: &quot;Hi, ${AttendeeName} please answer the questions t [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string AttendeeFixedQuestionsInput {
+            get {
+                return ResourceManager.GetString("AttendeeFixedQuestionsInput", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;type&quot;: &quot;AdaptiveCard&quot;,
+        ///  &quot;version&quot;: &quot;1.3&quot;,
+        ///  &quot;body&quot;: [
+        ///    {
+        ///      &quot;type&quot;: &quot;ColumnSet&quot;,
+        ///      &quot;columns&quot;: [
+        ///        {
+        ///          &quot;type&quot;: &quot;Column&quot;,
+        ///          &quot;width&quot;: &quot;auto&quot;,
+        ///          &quot;items&quot;: [
+        ///            {
+        ///              &quot;type&quot;: &quot;TextBlock&quot;,
+        ///              &quot;text&quot;: &quot;${AttendeeName} has joined the learning group&quot;,
+        ///              &quot;wrap&quot;: true
+        ///            }
+        ///          ],
+        ///          &quot;spacing&quot;: &quot;None&quot;
+        ///        }
+        ///      ]
+        ///    },
+        ///    {
+        ///      &quot;type&quot;: &quot;TextBlock&quot;,
+        ///      &quot;text&quot;: &quot;Hi, my name is $ [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string AttendeeFixedQuestionsPublication {
+            get {
+                return ResourceManager.GetString("AttendeeFixedQuestionsPublication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;type&quot;: &quot;AdaptiveCard&quot;,
+        ///  &quot;version&quot;: &quot;1.3&quot;,
+        ///  &quot;body&quot;: [
+        ///    {
+        ///      &quot;type&quot;: &quot;ColumnSet&quot;,
+        ///      &quot;columns&quot;: [
+        ///        {
+        ///          &quot;type&quot;: &quot;Column&quot;,
+        ///          &quot;width&quot;: &quot;auto&quot;,
         ///          &quot;spacing&quot;: &quot;None&quot;,
         ///          &quot;items&quot;: [
         ///            {
@@ -117,6 +181,32 @@ namespace TrainingOnboarding.Bot.Properties {
         internal static string CourseWelcome {
             get {
                 return ResourceManager.GetString("CourseWelcome", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///    &quot;type&quot;: &quot;AdaptiveCard&quot;,
+        ///    &quot;version&quot;: &quot;1.3&quot;,
+        ///    &quot;body&quot;: [
+        ///        {
+        ///            &quot;type&quot;: &quot;TextBlock&quot;,
+        ///            &quot;text&quot;: &quot;Meet and greet your colleagues in the program&quot;,
+        ///            &quot;wrap&quot;: true
+        ///        },
+        ///        {
+        ///            &quot;type&quot;: &quot;ActionSet&quot;,
+        ///            &quot;actions&quot;: [
+        ///              {
+        ///                &quot;type&quot;: &quot;Action.Submit&quot;,
+        ///                &quot;title&quot;: &quot;Introduce Yourself&quot;,
+        ///                &quot;data&quot;: {
+        ///                  &quot;action&quot;: &quot;StartIntroduction&quot;,
+        ///                  &quot;SPID&quot;: &quot;${Share [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string IntroduceYourself {
+            get {
+                return ResourceManager.GetString("IntroduceYourself", resourceCulture);
             }
         }
         

@@ -1,10 +1,8 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Teams;
 using Microsoft.Bot.Schema;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TrainingOnboarding.Bot.Cards;
@@ -16,16 +14,16 @@ namespace TrainingOnboarding.Bot
 {
     public class TraingOnboardingBot : TeamsActivityHandler
     {
-        public readonly IConfiguration _configuration;
+        public readonly BotConfig _configuration;
         private readonly BotHelper _helper;
 
         BotConversationCache _conversationCache = null;
 
-        public TraingOnboardingBot(BotHelper helper, IConfiguration configuration, BotConversationCache botConversationCache)
+        public TraingOnboardingBot(BotHelper helper, BotConfig configuration, BotConversationCache botConversationCache)
         {
             _helper = helper;
-            _configuration = configuration;
             _conversationCache = botConversationCache;
+            _configuration = configuration;
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
@@ -61,14 +59,14 @@ namespace TrainingOnboarding.Bot
         /// <summary>
         /// Someone replied via an Adaptive card form
         /// </summary>
-        private async Task HandleCardResponse(string json, ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+        private async Task HandleCardResponse(string submitJson, ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             // Form action
             ActionResponse r = null;
 
             try
             {
-                r = JsonConvert.DeserializeObject<ActionResponse>(json);
+                r = JsonConvert.DeserializeObject<ActionResponse>(submitJson);
             }
             catch (JsonException)
             {
@@ -78,58 +76,61 @@ namespace TrainingOnboarding.Bot
             // Figure out what was done
             if (r.Action == CardConstants.CardActionValLearnerTasksDone)
             {
-                var update = new CourseTasksUpdateInfo
-                {
-                    UserAadObjectId = turnContext.Activity.From.AadObjectId
-                };
+                var update = new CourseTasksUpdateInfo(submitJson, turnContext.Activity.From.AadObjectId);
+                await update.SendReply(turnContext, cancellationToken, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword, _configuration.SharePointSiteId);
+                
+            }
+            else if (r.Action == CardConstants.CardActionValStartIntroduction)
+            {
+                var spAction = JsonConvert.DeserializeObject<ActionResponseForSharePointItem>(submitJson);
 
-                // Enum the JSon dynamically to discover properties
-                var d = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(json);
-                foreach (var item in d)
-                {
-                    if (item.Key != null && item.Key.StartsWith("chk-"))
-                    {
-                        var requirementdIdString = item.Key.TrimStart("chk-".ToCharArray());
-                        var requirementdId = 0;
-                        var done = false;
-                        bool.TryParse(item.Value, out done);
-                        int.TryParse(requirementdIdString, out requirementdId);
-                        if (done && requirementdId != 0)
-                        {
-                            update.ConfirmedTaskIds.Add(requirementdId);
-                        }
-                    }
-                }
-                if (update.HasChanges)
-                {
-                    var token = await AuthHelper.GetToken(turnContext.Activity.Conversation.TenantId, _configuration["MicrosoftAppId"], _configuration["MicrosoftAppPassword"]);
-                    var graphClient = AuthHelper.GetAuthenticatedClient(token);
+                var token = await AuthHelper.GetToken(turnContext.Activity.Conversation.TenantId, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword);
+                var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
-                    // Save to SP list
-                    var updateCount = await update.SaveChanges(graphClient, _configuration["SharePointSiteId"]);
+                var attendanceInfo = await CourseAttendance.LoadById(graphClient, _configuration.SharePointSiteId, spAction.SPID);
+                await turnContext.SendActivityAsync(MessageFactory.Attachment(new AttendeeFixedQuestionsInputCard(attendanceInfo).GetCard()));
+            }
+            else if (r.Action == CardConstants.CardActionValSaveIntroductionQuestions)
+            {
+                var introductionData = JsonConvert.DeserializeObject<IntroduceYourselfResponse>(submitJson);
 
-                    await turnContext.SendActivityAsync(MessageFactory.Text(
-                        $"Updated {updateCount} tasks as complete - thanks for getting ready!"
-                    ), cancellationToken);
+                var token = await AuthHelper.GetToken(turnContext.Activity.Conversation.TenantId, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword);
+                var graphClient = AuthHelper.GetAuthenticatedClient(token);
+
+                var attendanceInfo = await CourseAttendance.LoadById(graphClient, _configuration.SharePointSiteId, introductionData.SPID);
+                if (introductionData.IsValid)
+                {
+                    // Save intro data
+                    attendanceInfo.QACountry = introductionData.Country;
+                    attendanceInfo.QAMobilePhoneNumber = introductionData.MobilePhoneNumber;
+                    attendanceInfo.QAOrg = introductionData.Org;
+                    attendanceInfo.QARole = introductionData.Role;
+                    attendanceInfo.QASpareTimeActivities = introductionData.SpareTimeActivities;
+                    attendanceInfo.IntroductionDone = true;
+
+                    await attendanceInfo.SaveChanges(graphClient, _configuration.SharePointSiteId);
+
+                    // Send back to user for now
+                    await turnContext.SendActivityAsync(MessageFactory.Attachment(new AttendeeFixedQuestionsPublicationCard(attendanceInfo).GetCard()));
                 }
                 else
                 {
-
                     await turnContext.SendActivityAsync(MessageFactory.Text(
-                        $"Nothing finished from this list?"
-                    ), cancellationToken);
+                        $"Oops, that doesn't seem right - check the values & try again?"
+                        ), cancellationToken);
                 }
             }
 
         }
 
+
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
-            var token = await AuthHelper.GetToken(turnContext.Activity.Conversation.TenantId, _configuration["MicrosoftAppId"], _configuration["MicrosoftAppPassword"]);
+            var token = await AuthHelper.GetToken(turnContext.Activity.Conversation.TenantId, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword);
             var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
             // Load all course data from lists
-            var courseInfo = await CoursesMetadata.LoadTrainingSPData(graphClient, _configuration["SharePointSiteId"]);
+            var courseInfo = await CoursesMetadata.LoadTrainingSPData(graphClient, _configuration.SharePointSiteId);
 
             foreach (var member in membersAdded)
             {

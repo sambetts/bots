@@ -7,6 +7,8 @@ namespace TrainingOnboarding.Models
 {
     public abstract class BaseSPItem
     {
+        #region Constructors
+
         public BaseSPItem() { }
 
         protected BaseSPItem(ListItem item)
@@ -22,6 +24,9 @@ namespace TrainingOnboarding.Models
             }
             this.ID = item.Fields.Id;
         }
+        #endregion
+
+        #region SP Parsers
 
         protected string GetFieldValue(ListItem item, string propName)
         {
@@ -44,6 +49,17 @@ namespace TrainingOnboarding.Models
                 return string.Empty;
             }
         }
+
+        protected bool GetFieldBool(ListItem item, string propName)
+        {
+            var b = GetFieldValue(item, propName);
+            var val = false;
+            bool.TryParse(b, out val);
+            return val;
+        }
+
+        #endregion
+
         public string ID { get; set; }
 
         public virtual bool IsValid => true;

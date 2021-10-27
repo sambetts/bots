@@ -28,23 +28,6 @@
         },
         {
             "type": "TextBlock",
-            "text": "Meet and greet your colleagues in the program",
-            "wrap": true
-        },
-        {
-            "type": "ActionSet",
-            "actions": [
-                {
-                    "type": "Action.ShowCard",
-                    "title": "Introduce Yourself ",
-                    "card": {
-                        "type": "AdaptiveCard"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "TextBlock",
             "text": "Don't forget your Activities to get started!",
             "wrap": true
         },

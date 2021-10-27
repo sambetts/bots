@@ -57,7 +57,7 @@ namespace TrainingOnboarding.Bot.Services
             var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
             // Load all course data from lists
-            var courseInfo = await CoursesMetadata.LoadTrainingSPData(graphClient, Config.SiteId);
+            var courseInfo = await CoursesMetadata.LoadTrainingSPData(graphClient, Config.SharePointSiteId);
 
             // Trigger appropriate conversation updates
             var pendingTrainingActions = courseInfo.GetUserActionsWithThingsToDo(true);

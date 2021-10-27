@@ -68,7 +68,13 @@ namespace TrainingOnboarding.Bot.Helpers
 
                     // Don't send course intro twice to same user
                     userAttendeeInfoForCourse.BotContacted = true;
-                    await userAttendeeInfoForCourse.SaveChanges(graphClient, Config.SiteId);
+                    await userAttendeeInfoForCourse.SaveChanges(graphClient, Config.SharePointSiteId);
+                }
+
+                // Personal introduction needed?
+                if (!userAttendeeInfoForCourse.IntroductionDone)
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Attachment(new IntroduceYourselfCard(userAttendeeInfoForCourse).GetCard()), cancellationToken);
                 }
 
                 // Send outstanding course actions
@@ -126,7 +132,7 @@ namespace TrainingOnboarding.Bot.Helpers
             var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
             // Load all course data from lists
-            var allTrainingData = await CoursesMetadata.LoadTrainingSPData(graphClient, Config.SiteId);
+            var allTrainingData = await CoursesMetadata.LoadTrainingSPData(graphClient, Config.SharePointSiteId);
 
             var coursesThisUserIsLeading = allTrainingData.Courses.Where(c => c.Trainer?.Email?.ToLower() == trainerEmail.ToLower()).ToList();
 
