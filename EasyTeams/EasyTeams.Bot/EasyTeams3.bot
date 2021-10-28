@@ -1,0 +1,18 @@
+{
+    "name": "EasyTeams",
+    "description": "",
+    "services": [
+      {
+        "type": "endpoint",
+        "appId": "a8b4abc2-da6b-4377-b90d-7ea1974ab85c",
+        "appPassword": ":VD?R/b!EO/rU0O=rX&0Lle2}O_s",
+        "endpoint": "https://localhost:44388/api/messages",
+        "id": "eb075880-7370-11ea-a0ad-ebcc5ef4484e",
+        "name": "EasyTeamsBot3"
+      }
+    ],
+    "padlock": "",
+    "version": "2.0",
+    "path": "C:\\Users\\sambetts\\source\\repos\\EasyTeams\\EasyTeamsTest.Bot\\EasyTeams.bot",
+    "overrides": null
+}
