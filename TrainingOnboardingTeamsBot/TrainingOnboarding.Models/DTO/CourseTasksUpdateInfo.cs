@@ -37,7 +37,7 @@ namespace TrainingOnboarding.Models
             
         }
 
-        public async Task SendReply(ITurnContext<Microsoft.Bot.Schema.IMessageActivity> turnContext, CancellationToken cancellationToken, string appId, string appPassword, string siteId)
+        public async Task SendReply(ITurnContext turnContext, CancellationToken cancellationToken, string appId, string appPassword, string siteId)
         {
             if (this.HasChanges)
             {
@@ -45,10 +45,10 @@ namespace TrainingOnboarding.Models
                 var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
                 // Save to SP list
-                var updateCount = await this.SaveChanges(graphClient, siteId);
+                await this.SaveChanges(graphClient, siteId);
 
                 await turnContext.SendActivityAsync(MessageFactory.Text(
-                    $"Updated {updateCount} tasks as complete - thanks for getting ready!"
+                    $"Updated tasks as complete - thanks for getting ready!"
                 ), cancellationToken);
             }
             else
@@ -66,8 +66,10 @@ namespace TrainingOnboarding.Models
 
         public string UserAadObjectId { get; set; }
 
-
-        public async Task<int> SaveChanges(GraphServiceClient graphClient, string siteId)
+        /// <summary>
+        /// Save to SharePoint
+        /// </summary>
+        public async Task SaveChanges(GraphServiceClient graphClient, string siteId)
         {
             if (string.IsNullOrEmpty(UserAadObjectId))
             {
@@ -148,8 +150,6 @@ namespace TrainingOnboarding.Models
                     .Request()
                     .AddAsync(confirmationItem);
             }
-
-            return ConfirmedTaskIds.Count;
         }
     }
 }

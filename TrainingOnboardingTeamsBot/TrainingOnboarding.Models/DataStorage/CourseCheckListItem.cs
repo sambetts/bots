@@ -13,14 +13,14 @@ namespace TrainingOnboarding.Models
         }
         public CheckListItem(ListItem item) : base(item)
         {
-            this.CourseID = base.GetFieldValue(item, "CourseID");
+            this.CourseID = base.GetFieldInt(item, "CourseID");
             this.Requirement = item.Fields.AdditionalData["Title"]?.ToString();
         }
 
-        public string CourseID { get; set; }
+        public int CourseID { get; set; }
         public string Requirement { get; set; }
 
-        public override bool IsValid => !string.IsNullOrEmpty(Requirement) && !string.IsNullOrEmpty(CourseID);
+        public override bool IsValid => !string.IsNullOrEmpty(Requirement) && CourseID != 0;
 
         public List<string> FinishedBy { get; set; } = new List<string>();
         public List<SiteUser> CompletedUsers { get; set; } = new List<SiteUser>();

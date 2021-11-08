@@ -26,7 +26,7 @@ namespace TrainingOnboarding.Bot.Cards
         {
             var json = Properties.Resources.IntroduceYourself;
 
-            json = base.ReplaceVal(json, CardConstants.FIELD_NAME_SHAREPOINT_ID, this.InfoToUpdate.ID);
+            json = base.ReplaceVal(json, CardConstants.FIELD_NAME_SHAREPOINT_ID, this.InfoToUpdate.ID.ToString());
 
 
             return json;

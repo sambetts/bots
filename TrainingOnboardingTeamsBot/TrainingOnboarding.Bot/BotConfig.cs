@@ -20,6 +20,7 @@ namespace TrainingOnboarding.Bot
             this.MicrosoftAppId = configuration["MicrosoftAppId"];
             this.MicrosoftAppPassword = configuration["MicrosoftAppPassword"];
             this.AppCatalogTeamAppId = configuration["AppCatalogTeamAppId"];
+            this.BotOAuthConnectionName = configuration["BotOAuthConnectionName"];
         }
 
         public string AppInsights { get; set; }
@@ -30,5 +31,6 @@ namespace TrainingOnboarding.Bot
         public string MicrosoftAppId { get; set; }
         public string MicrosoftAppPassword { get; set; }
         public string TenantId { get; set; }
+        public string BotOAuthConnectionName { get; set; }
     }
 }

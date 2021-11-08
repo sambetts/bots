@@ -10,9 +10,9 @@ namespace TrainingOnboarding.Models
     {
         public CheckListConfirmation(ListItem item, List<SiteUser> allUsers) : base(item, allUsers, "DoneByLookupId")
         {
-            this.CheckListItemId = GetFieldValue(item, "CheckListID");
+            this.CheckListItemId = GetFieldInt(item, "CheckListID");
         }
 
-        public string CheckListItemId { get; set; }
+        public int CheckListItemId { get; set; }
     }
 }

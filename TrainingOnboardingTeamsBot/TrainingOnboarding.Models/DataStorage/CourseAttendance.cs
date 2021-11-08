@@ -14,7 +14,7 @@ namespace TrainingOnboarding.Models
         public CourseAttendance() { }
         public CourseAttendance(ListItem item, List<SiteUser> allUsers) : base(item, allUsers, "AssignedUserLookupId")
         {
-            this.CourseId = GetFieldValue(item, "CourseattendanceID");
+            this.CourseId = GetFieldInt(item, "CourseattendanceID");
             this.QACountry = GetFieldValue(item, "QACountry");
             this.QARole = GetFieldValue(item, "QARole");
             this.QAOrg = GetFieldValue(item, "QAOrg");
@@ -27,7 +27,7 @@ namespace TrainingOnboarding.Models
 
         #region Props
 
-        public string CourseId { get; set; }
+        public int CourseId { get; set; }
 
         public string QACountry { get; set; }
         public string QARole { get; set; }
@@ -55,7 +55,7 @@ namespace TrainingOnboarding.Models
                 taskItem = (await graphClient
                     .Sites[siteId]
                     .Lists[attendenceList.Id]
-                    .Items[this.ID]
+                    .Items[this.ID.ToString()]
                     .Request()
                     .Expand("fields")
                     .GetAsync());
@@ -75,7 +75,7 @@ namespace TrainingOnboarding.Models
             await graphClient
                         .Sites[siteId]
                         .Lists[attendenceList.Id]
-                        .Items[this.ID]
+                        .Items[this.ID.ToString()]
                         .Request()
                         .UpdateAsync(new ListItem
                         {

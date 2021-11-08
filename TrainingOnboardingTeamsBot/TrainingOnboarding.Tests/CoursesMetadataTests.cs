@@ -118,8 +118,8 @@ namespace TrainingOnboarding.Tests
             var a = new CourseAttendance
             {
                 BotContacted = true,
-                CourseId = "1",
-                ID = "1",
+                CourseId = 1,
+                ID = 1,
                 QACountry = "1232",
                 QAMobilePhoneNumber = "345",
                 QARole = "567",

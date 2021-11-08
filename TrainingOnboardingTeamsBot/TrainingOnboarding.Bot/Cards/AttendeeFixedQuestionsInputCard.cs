@@ -34,7 +34,7 @@ namespace TrainingOnboarding.Bot.Cards
             json = base.ReplaceVal(json, CardConstants.FIELD_NAME_QASpareTimeActivities, this.InfoToUpdate.QASpareTimeActivities);
             json = base.ReplaceVal(json, CardConstants.FIELD_NAME_QAMobilePhoneNumber, this.InfoToUpdate.QAMobilePhoneNumber);
 
-            json = base.ReplaceVal(json, CardConstants.FIELD_NAME_SHAREPOINT_ID, this.InfoToUpdate.ID);
+            json = base.ReplaceVal(json, CardConstants.FIELD_NAME_SHAREPOINT_ID, this.InfoToUpdate.ID.ToString());
 
             return json;
         }
