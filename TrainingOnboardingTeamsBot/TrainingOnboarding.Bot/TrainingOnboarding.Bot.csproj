@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <UserSecretsId>3daa0a5e-1462-49fe-a15e-2a09864f89ea</UserSecretsId>
     <ApplicationInsightsResourceId>/subscriptions/ced25c7a-1927-4d06-b199-0c8e0a51574c/resourcegroups/TrainingOnboardingBot/providers/Microsoft.Insights/components/DigitalTrainingAssistantDev</ApplicationInsightsResourceId>

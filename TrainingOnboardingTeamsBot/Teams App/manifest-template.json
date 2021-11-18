@@ -1,0 +1,43 @@
+{
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.11/MicrosoftTeams.schema.json",
+    "manifestVersion": "1.11",
+    "version": "1.0.0",
+    "id": "<<GENERATE_NEW_GUID>>",
+    "packageName": "com.example.contoso",
+    "developer": {
+        "name": "contoso",
+        "websiteUrl": "https://www.contoso.com",
+        "privacyUrl": "https://www.contoso.com/privacy",
+        "termsOfUseUrl": "https://www.contoso.com/legal"
+    },
+    "icons": {
+        "color": "color.png",
+        "outline": "outline.png"
+    },
+    "name": {
+        "short": "Digital Training Assistant",
+        "full": "Training Onboarding App for trainees"
+    },
+    "description": {
+        "short": "Samples of Proactive Messaging in Teams",
+        "full": "Samples for getting conversation coordinates and sending proactive messages in Microsoft Teams."
+    },
+    "accentColor": "#FFFFFF",
+    "bots": [
+        {
+            "botId": "<<BOT_APP_ID>>",
+            "scopes": [
+                "personal"
+            ],
+            "supportsFiles": false,
+            "isNotificationOnly": false
+        }
+    ],
+    "permissions": [
+        "identity",
+        "messageTeamMembers"
+    ],
+    "validDomains": [
+        "token.botframework.com"
+    ]
+}

@@ -1,14 +1,10 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
-using Newtonsoft.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using TrainingOnboarding.Bot.Cards;
 using TrainingOnboarding.Bot.Dialogues.Abstract;
 using TrainingOnboarding.Bot.Helpers;
-using TrainingOnboarding.Bot.Models;
-using TrainingOnboarding.Models;
 
 namespace TrainingOnboarding.Bot.Dialogues
 {
@@ -41,17 +37,33 @@ namespace TrainingOnboarding.Bot.Dialogues
             {
                 return await _botHelper.HandleCardResponse(stepContext, val.ToString(), cancellationToken);
             }
-            else 
+            else
             {
                 // Text command. Done. 
                 if (inputText.ToLower() == "remind")
                 {
-                    var coursesFound = await _botHelper.RemindClassMembersWithOutstandingTasks((ITurnContext<IMessageActivity>)stepContext.Context, cancellationToken, false);
+                    try
+                    {
+                        var coursesFound = await _botHelper.RemindClassMembersWithOutstandingTasks((ITurnContext<IMessageActivity>)stepContext.Context, cancellationToken, false);
 
-                    await stepContext.Context.SendActivityAsync(MessageFactory.Text(
-                        $"Found {coursesFound.Actions.Count} outstanding action(s) for {coursesFound.UniqueUsers.Count} user(s), " +
-                        $"across {coursesFound.UniqueCourses.Count} course(s) that you are the trainer for. All users notified."
+                        await stepContext.Context.SendActivityAsync(MessageFactory.Text(
+                            $"Found {coursesFound.Actions.Count} outstanding action(s) for {coursesFound.UniqueUsers.Count} user(s), " +
+                            $"across {coursesFound.UniqueCourses.Count} course(s) that you are the trainer for. All users notified."
+                            ), cancellationToken);
+                    }
+                    catch (BotSharePointAccessException)
+                    {
+                        await stepContext.Context.SendActivityAsync(MessageFactory.Text(
+                            $"I can't seem to access my database to figure out what's going on, sorry! Check my access to SharePoint site '{_configuration.SharePointSiteId}' " +
+                            $"(app ID {_configuration.MicrosoftAppId})?"
                         ), cancellationToken);
+
+                    }
+                    catch(GraphAccessException ex) 
+                    {
+                        await stepContext.Context.SendActivityAsync(MessageFactory.Text(ex.Message), cancellationToken);
+                    }
+
                 }
                 return await stepContext.EndDialogAsync(null, cancellationToken);
             }

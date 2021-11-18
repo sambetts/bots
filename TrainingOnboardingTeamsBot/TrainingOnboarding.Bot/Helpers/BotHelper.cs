@@ -221,7 +221,19 @@ namespace TrainingOnboarding.Bot.Helpers
             var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
             // Load all course data from lists
-            var allTrainingData = await CoursesMetadata.LoadTrainingSPData(graphClient, Config.SharePointSiteId);
+            CoursesMetadata allTrainingData = null;
+            try
+            {
+                allTrainingData = await CoursesMetadata.LoadTrainingSPData(graphClient, Config.SharePointSiteId);
+            }
+            catch (ServiceException ex)
+            {
+                if (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                {
+                    throw new BotSharePointAccessException();
+                }
+            }
+            
 
             var coursesThisUserIsLeading = allTrainingData.Courses.Where(c => c.Trainer?.Email?.ToLower() == trainerEmail.ToLower()).ToList();
 
@@ -236,7 +248,14 @@ namespace TrainingOnboarding.Bot.Helpers
                     // Does this user have any training actions?
                     var thisUserPendingActions = pendingTrainingActionsForCoursesThisUserIsTeaching.GetActionsByEmail(user.EmailAddress);
 
-                    await CheckIfUserHasActionsAndSendMessagesIfNeeded(user, thisUserPendingActions, botAdapter, graphClient, cancellationToken);
+                    try
+                    {
+                        await CheckIfUserHasActionsAndSendMessagesIfNeeded(user, thisUserPendingActions, botAdapter, graphClient, cancellationToken);
+                    }
+                    catch (ErrorResponseException)
+                    {
+                        await _conversationCache.RemoveFromCache(user.RowKey);
+                    }
                 }
             }
 
@@ -248,12 +267,38 @@ namespace TrainingOnboarding.Bot.Helpers
 
             foreach (var userEmailToInstallApp in uncachedEmailAddresses)
             {
-                var user = await graphClient.Users[userEmailToInstallApp].Request().GetAsync();
-                await InstallTrainingBotForTarget(user.Id,
+                // Get user from Graph
+                User user = null;
+                try
+                {
+                    user = await graphClient.Users[userEmailToInstallApp].Request().GetAsync();
+                }
+                catch (ServiceException ex)
+                {
+                    if (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                    {
+                        throw new GraphAccessException("I don't seem to have permissions to read Azure AD users (User.Read.All)");
+                    }
+                    throw;
+                }
+
+                try
+                {
+                    await InstallTrainingBotForTarget(user.Id,
                         tenantId,
                         Config.MicrosoftAppId,
                         Config.MicrosoftAppPassword,
                         Config.AppCatalogTeamAppId);
+                }
+                catch (ServiceException ex)
+                {
+                    if (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                    {
+                        throw new GraphAccessException("I don't seem to have permissions to install my Teams App for trainees so I can proactively remind them (TeamsAppInstallation.ReadWriteForUser.All)");
+                    }
+                    throw;
+                }
+                
             }
 
             return pendingTrainingActionsForCoursesThisUserIsTeaching;

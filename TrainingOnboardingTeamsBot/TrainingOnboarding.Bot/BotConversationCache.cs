@@ -35,9 +35,20 @@ namespace TrainingOnboarding.Bot
         private TableClient TableClient { get; set; }
         public int RefrenceCount => _userIdConversationCache.Count;
 
+        internal async Task RemoveFromCache(string aadObjectId)
+        {
+            CachedUserAndConversationData u = null;
+            if (_userIdConversationCache.TryGetValue(aadObjectId, out u))
+            {
+                _userIdConversationCache.TryRemove(aadObjectId, out u);
+            }
+
+            await TableClient.DeleteEntityAsync(CachedUserAndConversationData.PartitionKeyVal, aadObjectId);
+        }
+
         internal async Task AddOrUpdateUserAndConversationId(ConversationReference conversationReference, string serviceUrl, GraphServiceClient graphClient)
         {
-            CachedUserAndConversationData u = null; 
+            CachedUserAndConversationData u = null;
             if (!_userIdConversationCache.TryGetValue(conversationReference.User.AadObjectId, out u))
             {
 
@@ -65,11 +76,11 @@ namespace TrainingOnboarding.Bot
                     var user = await graphClient.Users[conversationReference.User.AadObjectId].Request().GetAsync();
 
                     // Not in storage account either. Add there
-                    u = new CachedUserAndConversationData() 
-                    { 
-                        RowKey = conversationReference.User.AadObjectId, 
-                        ServiceUrl = serviceUrl, 
-                        EmailAddress = user.UserPrincipalName 
+                    u = new CachedUserAndConversationData()
+                    {
+                        RowKey = conversationReference.User.AadObjectId,
+                        ServiceUrl = serviceUrl,
+                        EmailAddress = user.UserPrincipalName
                     };
                     u.ConversationId = conversationReference.Conversation.Id;
                     TableClient.AddEntity(u);
@@ -92,7 +103,7 @@ namespace TrainingOnboarding.Bot
 
         internal CachedUserAndConversationData GetCachedUser(string aadObjectId)
         {
-            return _userIdConversationCache.Values.Where(u=> u.RowKey == aadObjectId).SingleOrDefault();
+            return _userIdConversationCache.Values.Where(u => u.RowKey == aadObjectId).SingleOrDefault();
         }
 
         internal bool ContainsUserId(string aadId)
@@ -108,6 +119,10 @@ namespace TrainingOnboarding.Bot
     {
         public static string PartitionKeyVal => "Users";
         public string PartitionKey { get => PartitionKeyVal; set { return; } }
+
+        /// <summary>
+        /// Azure AD ID
+        /// </summary>
         public string RowKey { get; set; }
         public DateTimeOffset? Timestamp { get; set; }
         public ETag ETag { get; set; }

@@ -1,12 +1,9 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Schema;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TrainingOnboarding.Bot.Cards;
@@ -91,10 +88,7 @@ namespace TrainingOnboarding.Bot.Dialogues
             var tokenResponse = (TokenResponse)stepContext.Result;
             if (tokenResponse?.Token != null)
             {
-
                 await stepContext.Context.SendActivityAsync($"Niiiiiiiiiiiiiiiiiiiiiceeeee");
-
-                return await stepContext.PromptAsync(nameof(ConfirmPrompt), new PromptOptions { Prompt = MessageFactory.Text("Would you like to view your token?") }, cancellationToken);
             }
 
             await stepContext.Context.SendActivityAsync(MessageFactory.Text("Login was not successful please try again."), cancellationToken);
