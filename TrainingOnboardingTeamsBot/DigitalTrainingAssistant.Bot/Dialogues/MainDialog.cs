@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace DigitalTrainingAssistant.Bot.Dialogues
 {
+    /// <summary>
+    /// Entrypoint to all new conversations
+    /// </summary>
     public class MainDialog : CancelAndHelpDialog
     {
         private BotHelper _botHelper;
@@ -23,14 +26,12 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
             }));
             AddDialog(updateProfileDialog);
             InitialDialogId = nameof(WaterfallDialog);
-
         }
 
 
         private async Task<DialogTurnResult> Act(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             var inputText = stepContext.Context.Activity.Text ?? string.Empty;
-
             var val = stepContext.Context.Activity.Value ?? string.Empty;
 
             if (val != null && !string.IsNullOrEmpty(val.ToString()))
@@ -39,13 +40,16 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
             }
             else
             {
+                var command = inputText.ToLower();
+
                 // Text command. Done. 
-                if (inputText.ToLower() == "remind")
+                if (command == "remind")
                 {
                     try
                     {
                         var coursesFound = await _botHelper.RemindClassMembersWithOutstandingTasks((ITurnContext<IMessageActivity>)stepContext.Context, cancellationToken, false);
 
+                        // Send actions summary
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text(
                             $"Found {coursesFound.Actions.Count} outstanding action(s) for {coursesFound.UniqueUsers.Count} user(s), " +
                             $"across {coursesFound.UniqueCourses.Count} course(s) that you are the trainer for. All users notified."
@@ -53,23 +57,21 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
                     }
                     catch (BotSharePointAccessException)
                     {
+                        // Can't connect to SharePoint
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text(
                             $"I can't seem to access my database to figure out what's going on, sorry! Check my access to SharePoint site '{_configuration.SharePointSiteId}' " +
                             $"(app ID {_configuration.MicrosoftAppId})?"
                         ), cancellationToken);
 
                     }
-                    catch(GraphAccessException ex) 
+                    catch (GraphAccessException ex)
                     {
+                        // The exception contains the message for users
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text(ex.Message), cancellationToken);
                     }
-
                 }
                 return await stepContext.EndDialogAsync(null, cancellationToken);
             }
-
         }
-
-
     }
 }

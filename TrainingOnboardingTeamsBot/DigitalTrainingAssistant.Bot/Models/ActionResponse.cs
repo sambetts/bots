@@ -15,7 +15,7 @@ namespace DigitalTrainingAssistant.Bot.Models
     public class ActionResponseForSharePointItem
     {
         [JsonProperty(CardConstants.CardSharePointIdPropName)]
-        public string SPID { get; set; }
+        public int SPID { get; set; }
     }
 
     public class IntroduceYourselfResponse : ActionResponseForSharePointItem

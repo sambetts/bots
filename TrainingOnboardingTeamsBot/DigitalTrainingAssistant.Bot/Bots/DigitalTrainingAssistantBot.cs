@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 
 namespace DigitalTrainingAssistant.Bot
 {
-    // https://github.com/microsoft/BotBuilder-Samples/blob/main/samples/csharp_dotnetcore/46.teams-auth/Bots/TeamsBot.cs
-    public class TraingOnboardingBot<T> : DialogBot<T> where T : Dialog
+
+    public class DigitalTrainingAssistantBot<T> : DialogBot<T> where T : Dialog
     {
         public readonly BotConfig _configuration;
         private readonly BotHelper _helper;
         BotConversationCache _conversationCache = null;
 
-        public TraingOnboardingBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger, BotHelper helper, BotConfig configuration, BotConversationCache botConversationCache)
+        public DigitalTrainingAssistantBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger, BotHelper helper, BotConfig configuration, BotConversationCache botConversationCache)
             : base(conversationState, userState, dialog, logger)
         {
             _helper = helper;
@@ -67,8 +67,5 @@ namespace DigitalTrainingAssistant.Bot
             // Run the Dialog with the new Invoke Activity.
             await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
         }
-
-
-
     }
 }

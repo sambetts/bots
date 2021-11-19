@@ -128,12 +128,12 @@
     <value>..\cards\templates\botintroduction.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="CourseWelcome" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Cards\Templates\CourseWelcome.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+    <value>..\cards\templates\coursewelcome.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="IntroduceYourself" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\cards\templates\introduceyourself.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="LearnerQuestions" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Cards\Templates\LearnerQuestions.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+    <value>..\cards\templates\learnerquestions.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
 </root>

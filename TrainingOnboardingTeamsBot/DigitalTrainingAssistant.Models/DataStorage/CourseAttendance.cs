@@ -95,7 +95,7 @@ namespace DigitalTrainingAssistant.Models
 
         }
 
-        public static async Task<CourseAttendance> LoadById(GraphServiceClient graphClient, string siteId, string sPID)
+        public static async Task<CourseAttendance> LoadById(GraphServiceClient graphClient, string siteId, int sPID)
         {
             var allLists = await graphClient.Sites[siteId]
                                 .Lists
@@ -104,7 +104,7 @@ namespace DigitalTrainingAssistant.Models
 
             var coursesList = allLists.Where(l => l.Name == ModelConstants.ListNameCourses).SingleOrDefault();
             var courseAttendanceList = allLists.Where(l => l.Name == ModelConstants.ListNameCourseAttendance).SingleOrDefault();
-            var courseAttendanceItem = await graphClient.Sites[siteId].Lists[courseAttendanceList.Id].Items[sPID].Request().Expand("fields").GetAsync();
+            var courseAttendanceItem = await graphClient.Sites[siteId].Lists[courseAttendanceList.Id].Items[sPID.ToString()].Request().Expand("fields").GetAsync();
             var allUsers = await CoursesMetadata.LoadSiteUsers(graphClient, siteId);
 
             return new CourseAttendance(courseAttendanceItem, allUsers);

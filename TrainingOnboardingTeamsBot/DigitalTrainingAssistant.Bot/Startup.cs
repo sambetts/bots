@@ -58,7 +58,7 @@ namespace Microsoft.BotBuilderSamples
             services.AddSingleton<BotConversationCache>();
 
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
-            services.AddTransient<IBot, TraingOnboardingBot<MainDialog>>();
+            services.AddTransient<IBot, DigitalTrainingAssistantBot<MainDialog>>();
 
             services.AddHostedService<CourseChecklistReminderService>();
 
