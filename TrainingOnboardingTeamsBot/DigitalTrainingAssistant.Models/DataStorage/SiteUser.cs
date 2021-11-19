@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace TrainingOnboarding.Models
+namespace DigitalTrainingAssistant.Models
 {
 
     public class SiteUser : BaseSPItem

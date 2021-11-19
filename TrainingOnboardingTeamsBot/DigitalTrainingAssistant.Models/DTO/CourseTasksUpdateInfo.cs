@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TrainingOnboarding.Models
+namespace DigitalTrainingAssistant.Models
 {
     public class CourseTasksUpdateInfo
     {

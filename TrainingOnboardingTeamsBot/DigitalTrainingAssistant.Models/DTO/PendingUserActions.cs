@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace TrainingOnboarding.Models
+namespace DigitalTrainingAssistant.Models
 {
     /// <summary>
     /// Outstanding tasks for all users/course. Generated from a CoursesMetadata.

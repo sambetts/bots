@@ -1,10 +1,10 @@
-﻿using Microsoft.Graph;
+﻿using DigitalTrainingAssistant.Models.Util;
+using Microsoft.Graph;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TrainingOnboarding.Models.Util;
 
-namespace TrainingOnboarding.Models
+namespace DigitalTrainingAssistant.Models
 {
     public abstract class BaseSPItem
     {

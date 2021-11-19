@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TrainingOnboarding.Models\TrainingOnboarding.Models.csproj" />
+    <ProjectReference Include="..\DigitalTrainingAssistant.Models\DigitalTrainingAssistant.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>

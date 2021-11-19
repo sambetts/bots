@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TrainingOnboarding.Bot.Cards
+namespace DigitalTrainingAssistant.Bot.Cards
 {
     public abstract class BaseAdaptiveCard
     {

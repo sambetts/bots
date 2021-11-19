@@ -1,12 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TrainingOnboarding.Models.Util;
+﻿using DigitalTrainingAssistant.Models.Util;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace TrainingOnboarding.Tests
+namespace DigitalTrainingAssistant.Tests
 {
     [TestClass]
     public class UtilsTests

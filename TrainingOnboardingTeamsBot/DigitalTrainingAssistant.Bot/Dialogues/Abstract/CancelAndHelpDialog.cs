@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TrainingOnboarding.Bot.Dialogues.Abstract
+namespace DigitalTrainingAssistant.Bot.Dialogues.Abstract
 {
 
     public abstract class CancelAndHelpDialog : ComponentDialog

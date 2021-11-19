@@ -1,11 +1,7 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using TrainingOnboarding.Bot.Cards;
+﻿using DigitalTrainingAssistant.Bot.Cards;
+using Newtonsoft.Json;
 
-namespace TrainingOnboarding.Bot.Models
+namespace DigitalTrainingAssistant.Bot.Models
 {
     /// <summary>
     /// Json response from an adaptive card submit

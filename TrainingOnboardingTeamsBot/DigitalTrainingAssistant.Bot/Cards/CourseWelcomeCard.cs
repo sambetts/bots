@@ -1,13 +1,6 @@
-﻿using AdaptiveCards;
-using Microsoft.Bot.Schema;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using TrainingOnboarding.Bot.Models.Card;
-using TrainingOnboarding.Models;
+﻿using DigitalTrainingAssistant.Models;
 
-namespace TrainingOnboarding.Bot.Cards
+namespace DigitalTrainingAssistant.Bot.Cards
 {
 
     /// <summary>

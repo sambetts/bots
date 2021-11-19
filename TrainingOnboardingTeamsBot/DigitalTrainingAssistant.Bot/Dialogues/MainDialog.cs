@@ -1,12 +1,12 @@
-﻿using Microsoft.Bot.Builder;
+﻿using DigitalTrainingAssistant.Bot.Dialogues.Abstract;
+using DigitalTrainingAssistant.Bot.Helpers;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using System.Threading;
 using System.Threading.Tasks;
-using TrainingOnboarding.Bot.Dialogues.Abstract;
-using TrainingOnboarding.Bot.Helpers;
 
-namespace TrainingOnboarding.Bot.Dialogues
+namespace DigitalTrainingAssistant.Bot.Dialogues
 {
     public class MainDialog : CancelAndHelpDialog
     {

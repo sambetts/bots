@@ -1,19 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
-using Microsoft.Bot.Schema;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
-using TrainingOnboarding.Bot;
-using TrainingOnboarding.Bot.Helpers;
-using TrainingOnboarding.Bot.Services;
-using TrainingOnboarding.Bot.Dialogues;
+using DigitalTrainingAssistant.Bot;
+using DigitalTrainingAssistant.Bot.Dialogues;
+using DigitalTrainingAssistant.Bot.Services;
+using DigitalTrainingAssistant.Bot.Helpers;
 
 namespace Microsoft.BotBuilderSamples
 {

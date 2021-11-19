@@ -6,7 +6,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace TrainingOnboarding.Models
+namespace DigitalTrainingAssistant.Models
 {
     public abstract class AuthHelper
     {

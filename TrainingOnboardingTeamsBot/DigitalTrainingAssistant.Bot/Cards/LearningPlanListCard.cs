@@ -1,11 +1,9 @@
 ﻿using AdaptiveCards;
-using Microsoft.Bot.Schema;
-using System;
+using DigitalTrainingAssistant.Bot.Models.Card;
+using DigitalTrainingAssistant.Models;
 using System.Collections.Generic;
-using TrainingOnboarding.Bot.Models.Card;
-using TrainingOnboarding.Models;
 
-namespace TrainingOnboarding.Bot.Cards
+namespace DigitalTrainingAssistant.Bot.Cards
 {
     /// <summary>
     /// Class that helps to create learning plan list card.

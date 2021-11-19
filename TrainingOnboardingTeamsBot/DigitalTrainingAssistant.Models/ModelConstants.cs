@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TrainingOnboarding.Models
+namespace DigitalTrainingAssistant.Models
 {
     internal class ModelConstants
     {

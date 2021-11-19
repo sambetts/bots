@@ -1,18 +1,15 @@
-﻿using Microsoft.Bot.Builder;
+﻿using DigitalTrainingAssistant.Bot.Cards;
+using DigitalTrainingAssistant.Bot.Helpers;
+using DigitalTrainingAssistant.Models;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Builder.Teams;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using TrainingOnboarding.Bot.Cards;
-using TrainingOnboarding.Bot.Helpers;
-using TrainingOnboarding.Bot.Models;
-using TrainingOnboarding.Models;
 
-namespace TrainingOnboarding.Bot
+namespace DigitalTrainingAssistant.Bot
 {
     // https://github.com/microsoft/BotBuilder-Samples/blob/main/samples/csharp_dotnetcore/46.teams-auth/Bots/TeamsBot.cs
     public class TraingOnboardingBot<T> : DialogBot<T> where T : Dialog

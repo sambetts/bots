@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TrainingOnboarding.Bot.Properties {
+namespace DigitalTrainingAssistant.Bot.Properties {
     using System;
     
     

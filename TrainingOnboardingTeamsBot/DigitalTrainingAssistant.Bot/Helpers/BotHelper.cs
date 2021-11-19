@@ -1,4 +1,8 @@
-﻿using Microsoft.Bot.Builder;
+﻿using DigitalTrainingAssistant.Bot.Cards;
+using DigitalTrainingAssistant.Bot.Dialogues;
+using DigitalTrainingAssistant.Bot.Models;
+using DigitalTrainingAssistant.Models;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
@@ -8,12 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TrainingOnboarding.Bot.Cards;
-using TrainingOnboarding.Bot.Dialogues;
-using TrainingOnboarding.Bot.Models;
-using TrainingOnboarding.Models;
 
-namespace TrainingOnboarding.Bot.Helpers
+namespace DigitalTrainingAssistant.Bot.Helpers
 {
     /// <summary>
     /// Bot functionality

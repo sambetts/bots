@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TrainingOnboarding.Bot
+namespace DigitalTrainingAssistant.Bot
 {
     public abstract class BotException : Exception
     {

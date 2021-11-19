@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TrainingOnboarding.Models.Util
+namespace DigitalTrainingAssistant.Models.Util
 {
     public class StringUtils
     {

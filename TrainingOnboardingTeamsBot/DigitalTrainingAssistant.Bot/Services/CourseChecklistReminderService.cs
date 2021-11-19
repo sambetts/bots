@@ -1,13 +1,13 @@
-﻿using Microsoft.Bot.Builder;
+﻿using DigitalTrainingAssistant.Bot.Helpers;
+using DigitalTrainingAssistant.Models;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using TrainingOnboarding.Bot.Helpers;
-using TrainingOnboarding.Models;
 
-namespace TrainingOnboarding.Bot.Services
+namespace DigitalTrainingAssistant.Bot.Services
 {
     public class CourseChecklistReminderService : BackgroundService
     {

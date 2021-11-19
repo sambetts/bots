@@ -1,12 +1,12 @@
+using DigitalTrainingAssistant.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TrainingOnboarding.Models;
 
-namespace TrainingOnboarding.Tests
+namespace DigitalTrainingAssistant.Tests
 {
     [TestClass]
     public class CoursesMetadataTests
