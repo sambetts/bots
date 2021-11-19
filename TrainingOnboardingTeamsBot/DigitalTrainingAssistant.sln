@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrainingOnboarding.Bot", "TrainingOnboarding.Bot\TrainingOnboarding.Bot.csproj", "{084B1100-CE15-4F96-9957-2FBFDADBE264}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalTrainingAssistant.Bot", "DigitalTrainingAssistant.Bot\DigitalTrainingAssistant.Bot.csproj", "{084B1100-CE15-4F96-9957-2FBFDADBE264}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrainingOnboarding.Models", "TrainingOnboarding.Models\TrainingOnboarding.Models.csproj", "{CCCDDF46-25AC-4B02-A207-F94ABF463AB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalTrainingAssistant.Models", "DigitalTrainingAssistant.Models\DigitalTrainingAssistant.Models.csproj", "{CCCDDF46-25AC-4B02-A207-F94ABF463AB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingOnboarding.Tests", "TrainingOnboarding.Tests\TrainingOnboarding.Tests.csproj", "{AEE4EA32-B5C0-44C0-AA5A-14B90CFEAC17}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalTrainingAssistant.Tests", "DigitalTrainingAssistant.Tests\DigitalTrainingAssistant.UnitTests.csproj", "{AEE4EA32-B5C0-44C0-AA5A-14B90CFEAC17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
