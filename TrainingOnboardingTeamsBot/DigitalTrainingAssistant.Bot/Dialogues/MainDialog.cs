@@ -42,14 +42,14 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
             {
                 var command = inputText.ToLower();
 
-                // Text command. Done. 
                 if (command == "remind")
                 {
                     try
                     {
+                        // Find users to notify for outstanding tasks
                         var coursesFound = await _botHelper.RemindClassMembersWithOutstandingTasks((ITurnContext<IMessageActivity>)stepContext.Context, cancellationToken, false);
 
-                        // Send actions summary
+                        // Send actions summary back to trainer
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text(
                             $"Found {coursesFound.Actions.Count} outstanding action(s) for {coursesFound.UniqueUsers.Count} user(s), " +
                             $"across {coursesFound.UniqueCourses.Count} course(s) that you are the trainer for. All users notified."

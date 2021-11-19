@@ -6,6 +6,7 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -100,12 +101,46 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
 
         private async Task<DialogTurnResult> LoginStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            // Get the token from the previous step. Note that we could also have gotten the
-            // token directly from the prompt itself. There is an example of this in the next method.
+            var courseAttendance = (CourseAttendance)stepContext.Options;
+
             var tokenResponse = (TokenResponse)stepContext.Result;
             if (tokenResponse?.Token != null)
             {
-                await stepContext.Context.SendActivityAsync($"Niiiiiiiiiiiiiiiiiiiiiceeeee");
+
+                var graphClient = new Microsoft.Graph.GraphServiceClient(new Microsoft.Graph.DelegateAuthenticationProvider(
+                    async (requestMessage) =>
+                    {
+                        requestMessage.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", tokenResponse.Token);
+                        await Task.FromResult(0);
+                    })
+                );
+
+                var adaptiveCard = new AttendeeFixedQuestionsPublicationCard(courseAttendance).GetChatMessageAttachment();
+                adaptiveCard.Id = Guid.NewGuid().ToString();
+                var msg = new Microsoft.Graph.ChatMessage 
+                { 
+                    Attachments = new List<Microsoft.Graph.ChatMessageAttachment>() { adaptiveCard },
+                    Body = new Microsoft.Graph.ItemBody 
+                    {
+                        ContentType = Microsoft.Graph.BodyType.Html,
+                        Content = $"<attachment id=\"{adaptiveCard.Id}\"></attachment>"
+                    },
+                    Subject = "Welcome New Trainee!"
+                };
+
+                var options = new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+                };
+                var payloadin = System.Text.Json.JsonSerializer.Serialize(msg, options);
+
+
+                await graphClient
+                    .Teams[courseAttendance.ParentCourse.TeamId]
+                    .Channels[courseAttendance.ParentCourse.TeamChannelId]
+                    .Messages.Request().AddAsync(msg);
+
+                await stepContext.Context.SendActivityAsync($"I've posted your introduction to the course Team!");
 
                 // We're done either way
                 return await stepContext.EndDialogAsync(cancellationToken: cancellationToken);

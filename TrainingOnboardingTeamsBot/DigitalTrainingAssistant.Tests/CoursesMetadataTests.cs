@@ -79,7 +79,7 @@ namespace DigitalTrainingAssistant.Tests
         /// Basic data load test
         /// </summary>
         [TestMethod]
-        public async Task CoursesMetadataLoad()
+        public async Task CoursesMetadataLoadTrainingSPData()
         {
             var graphClient = await GetClient();
             var meta = await CoursesMetadata.LoadTrainingSPData(graphClient, _configuration["SharePointSiteId"]);
@@ -87,6 +87,17 @@ namespace DigitalTrainingAssistant.Tests
 
             Assert.IsTrue(meta.Courses.Count > 0);
             Assert.IsTrue(meta.Courses[0].Attendees.Count > 0);
+            Assert.IsTrue(meta.Courses[0].Attendees[0].ParentCourse.ID != 0);
+        }
+
+        [TestMethod]
+        public async Task CourseAttendanceLoadById()
+        {
+            var graphClient = await GetClient();
+            var attendance = await CourseAttendance.LoadById(graphClient, _configuration["SharePointSiteId"], 1);
+            Assert.IsNotNull(attendance);
+
+            Assert.IsTrue(attendance.ParentCourse.ID != 0);
         }
 
         /// <summary>

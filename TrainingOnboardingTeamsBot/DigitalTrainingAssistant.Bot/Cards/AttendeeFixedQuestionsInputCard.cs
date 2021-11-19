@@ -1,4 +1,6 @@
 ﻿using DigitalTrainingAssistant.Models;
+using Microsoft.Graph;
+using Newtonsoft.Json;
 
 namespace DigitalTrainingAssistant.Bot.Cards
 {
@@ -31,5 +33,9 @@ namespace DigitalTrainingAssistant.Bot.Cards
 
             return json;
         }
+
+
     }
+
+
 }

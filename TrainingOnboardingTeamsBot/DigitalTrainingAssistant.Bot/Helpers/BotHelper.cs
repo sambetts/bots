@@ -54,6 +54,9 @@ namespace DigitalTrainingAssistant.Bot.Helpers
             await _conversationCache.AddOrUpdateUserAndConversationId(conversationReference, activity.ServiceUrl, graphClient);
         }
 
+        /// <summary>
+        /// Main logic for sending notifications to trainees
+        /// </summary>
         public async Task SendCourseIntroAndTrainingRemindersToUser(CachedUserAndConversationData toUser, ITurnContext turnContext, CancellationToken cancellationToken, PendingUserActions userPendingActionsForCourse, GraphServiceClient graphClient)
         {
             // Send seperate card for each course with outstanding items
@@ -66,7 +69,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                         .Where(a => a.User.Email == toUser.EmailAddress).FirstOrDefault();
 
                 // Send course intro?
-                if (!userAttendeeInfoForCourse.BotContacted)
+                if (!userAttendeeInfoForCourse.BotContacted && course.HasValidTeamsSettings)
                 {
                     await turnContext.SendActivityAsync(MessageFactory.Attachment(new CourseWelcomeCard(BotConstants.BotName, course).GetCard()), cancellationToken);
 
@@ -161,7 +164,10 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                     attendanceInfo.QASpareTimeActivities = introductionData.SpareTimeActivities;
                     attendanceInfo.IntroductionDone = true;
 
+#if !DEBUG
                     await attendanceInfo.SaveChanges(graphClient, Config.SharePointSiteId);
+#endif
+
 
                     // Send back to user for now
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text("Saved. Now post it to the Team..."));
@@ -245,7 +251,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                 foreach (var user in _conversationCache.GetCachedUsers())
                 {
 
-                    // Does this user have any training actions?
+                    // Does this user have any custom training actions?
                     var thisUserPendingActions = pendingTrainingActionsForCoursesThisUserIsTeaching.GetActionsByEmail(user.EmailAddress);
 
                     try
@@ -254,6 +260,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                     }
                     catch (ErrorResponseException)
                     {
+                        // Something wierd happened resuming the conversation. Assume invalid conversation reference cache
                         await _conversationCache.RemoveFromCache(user.RowKey);
                     }
                 }

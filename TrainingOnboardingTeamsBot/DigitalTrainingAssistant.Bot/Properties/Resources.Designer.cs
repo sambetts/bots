@@ -106,17 +106,17 @@ namespace DigitalTrainingAssistant.Bot.Properties {
         ///          &quot;items&quot;: [
         ///            {
         ///              &quot;type&quot;: &quot;TextBlock&quot;,
-        ///              &quot;text&quot;: &quot;${AttendeeName} has joined the learning group&quot;,
+        ///              &quot;text&quot;: &quot;Adele Vance has joined the learning group&quot;,
         ///              &quot;wrap&quot;: true
         ///            }
         ///          ],
-        ///          &quot;spacing&quot;: &quot;None&quot;
+        ///          &quot;spacing&quot;: &quot;none&quot;
         ///        }
         ///      ]
         ///    },
         ///    {
         ///      &quot;type&quot;: &quot;TextBlock&quot;,
-        ///      &quot;text&quot;: &quot;Hi, my name is $ [rest of string was truncated]&quot;;.
+        ///      &quot;text&quot;: &quot;Hi, my name is Adele [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AttendeeFixedQuestionsPublication {
             get {

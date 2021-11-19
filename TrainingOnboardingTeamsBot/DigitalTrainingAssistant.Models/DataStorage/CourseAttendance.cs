@@ -12,8 +12,22 @@ namespace DigitalTrainingAssistant.Models
     public class CourseAttendance : BaseSPItemWithUser
     {
         public CourseAttendance() { }
-        public CourseAttendance(ListItem item, List<SiteUser> allUsers) : base(item, allUsers, "AssignedUserLookupId")
+
+        public CourseAttendance(ListItem item, List<SiteUser> allUsers) : this(item, allUsers, new Course())       // Call default constructor
         {
+        }
+        public CourseAttendance(ListItem item, List<SiteUser> allUsers, Course parentCourse) : base(item, allUsers, "AssignedUserLookupId")
+        {
+            if (item is null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+
+            if (allUsers is null)
+            {
+                throw new ArgumentNullException(nameof(allUsers));
+            }
+
             this.CourseId = GetFieldInt(item, "CourseattendanceID");
             this.QACountry = GetFieldValue(item, "QACountry");
             this.QARole = GetFieldValue(item, "QARole");
@@ -21,12 +35,20 @@ namespace DigitalTrainingAssistant.Models
             this.QASpareTimeActivities = GetFieldValue(item, "QASpareTimeActivities");
             this.QAMobilePhoneNumber = GetFieldValue(item, "QAMobileNumber");
 
+            this.ParentCourse = parentCourse ?? throw new ArgumentNullException(nameof(parentCourse));
             this.IntroductionDone = GetFieldBool(item, "IntroductionDone");
             this.BotContacted = GetFieldBool(item, "BotContacted");
         }
 
+        public CourseAttendance(ListItem item, List<SiteUser> allUsers, List<Course> allCourses) : this(item, allUsers, new Course())       // Call default constructor
+        { 
+            // Override parent-course
+            this.ParentCourse = allCourses.Where(c=> c.ID == this.CourseId).FirstOrDefault();
+        }
+
         #region Props
 
+        public Course ParentCourse { get; set; }
         public int CourseId { get; set; }
 
         public string QACountry { get; set; }
@@ -42,12 +64,7 @@ namespace DigitalTrainingAssistant.Models
 
         public async Task SaveChanges(GraphServiceClient graphClient, string siteId)
         {
-            var allLists = await graphClient.Sites[siteId]
-                    .Lists
-                    .Request()
-                    .GetAsync();
-
-            var attendenceList = allLists.Where(l => l.Name == ModelConstants.ListNameCourseAttendance).SingleOrDefault();
+            var attendenceList = await Utils.GetList(siteId, ModelConstants.ListNameCourseAttendance, graphClient);
 
             ListItem taskItem = null;
             try
@@ -97,17 +114,16 @@ namespace DigitalTrainingAssistant.Models
 
         public static async Task<CourseAttendance> LoadById(GraphServiceClient graphClient, string siteId, int sPID)
         {
-            var allLists = await graphClient.Sites[siteId]
-                                .Lists
-                                .Request()
-                                .GetAsync();
-
-            var coursesList = allLists.Where(l => l.Name == ModelConstants.ListNameCourses).SingleOrDefault();
-            var courseAttendanceList = allLists.Where(l => l.Name == ModelConstants.ListNameCourseAttendance).SingleOrDefault();
+            var courseAttendanceList = await Utils.GetList(siteId, ModelConstants.ListNameCourseAttendance, graphClient);
             var courseAttendanceItem = await graphClient.Sites[siteId].Lists[courseAttendanceList.Id].Items[sPID.ToString()].Request().Expand("fields").GetAsync();
             var allUsers = await CoursesMetadata.LoadSiteUsers(graphClient, siteId);
 
-            return new CourseAttendance(courseAttendanceItem, allUsers);
+            var attendance = new CourseAttendance(courseAttendanceItem, allUsers);
+            var course = await Course.LoadById(graphClient, siteId, attendance.CourseId);
+
+            attendance.ParentCourse = course;
+
+            return attendance;
         }
     }
 }

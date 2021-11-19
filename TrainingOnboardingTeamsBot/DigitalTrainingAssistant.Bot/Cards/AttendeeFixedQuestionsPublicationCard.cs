@@ -1,4 +1,6 @@
 ﻿using DigitalTrainingAssistant.Models;
+using Microsoft.Graph;
+using Newtonsoft.Json;
 
 namespace DigitalTrainingAssistant.Bot.Cards
 {
@@ -29,6 +31,16 @@ namespace DigitalTrainingAssistant.Bot.Cards
             json = base.ReplaceVal(json, CardConstants.FIELD_NAME_QAMobilePhoneNumber, this.Info.QAMobilePhoneNumber);
 
             return json;
+        }
+
+
+        public ChatMessageAttachment GetChatMessageAttachment()
+        {
+            return new ChatMessageAttachment
+            {
+                ContentType = AdaptiveCards.AdaptiveCard.ContentType,
+                Content = this.GetCardContent(),
+            };
         }
     }
 }

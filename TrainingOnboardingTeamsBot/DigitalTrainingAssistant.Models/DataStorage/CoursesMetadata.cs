@@ -24,10 +24,16 @@ namespace DigitalTrainingAssistant.Models
             IListItemsCollectionPage courseAttendanceList, List<SiteUser> allUsers, IListItemsCollectionPage checklistConfirmationsList)
         {
 
+            foreach (var courseItem in coursesListItems)
+            {
+                var course = new Course(courseItem, allUsers);
+                this.Courses.Add(course);
+            }
+
             var allAttendanceItems = new List<CourseAttendance>();
             foreach (var item in courseAttendanceList)
             {
-                allAttendanceItems.Add(new CourseAttendance(item, allUsers));
+                allAttendanceItems.Add(new CourseAttendance(item, allUsers, this.Courses));
             }
 
             var allChecklistConfItems = new List<CheckListConfirmation>();
@@ -44,11 +50,10 @@ namespace DigitalTrainingAssistant.Models
                 allCheckListItems.Add(checkListItem);
             }
 
-            foreach (var courseItem in coursesListItems)
-            {
-                var course = new Course(courseItem, allUsers);
-                this.Courses.Add(course);
 
+            // Assign course items
+            foreach (var course in Courses)
+            {
                 var courseCheckListItems = allCheckListItems.Where(l => l.CourseID == course.ID);
                 course.CheckListItems.AddRange(courseCheckListItems);
                 course.Attendees.AddRange(allAttendanceItems.Where(a => a.CourseId == course.ID));
@@ -178,6 +183,7 @@ namespace DigitalTrainingAssistant.Models
                 courses = Courses.Where(c => courseFitler.Contains(c) && c.Start.HasValue && c.Start.Value < DateTime.Now.AddDays(c.DaysBeforeToSendReminders));
             }
 
+            // Build custom task-list
             foreach (var c in courses)
             {
                 foreach (var attendee in c.Attendees)
@@ -186,6 +192,7 @@ namespace DigitalTrainingAssistant.Models
 
                     foreach (var thingToDo in c.CheckListItems)
                     {
+                        // If this atendee hasn't done the custom task, add it to the to-do list
                         if (!thingToDo.CompletedUsers.Contains(attendee.User))
                         {
                             newThingToDo.PendingItems.Add(thingToDo);
