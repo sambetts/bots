@@ -4,6 +4,7 @@ using DigitalTrainingAssistant.Bot.Models;
 using DigitalTrainingAssistant.Models;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
@@ -62,6 +63,38 @@ namespace DigitalTrainingAssistant.Bot.Helpers
             // Send seperate card for each course with outstanding items
             foreach (var course in userPendingActionsForCourse.UniqueCourses)
             {
+                // Install bot to course Team if there is one
+                if (course.HasValidTeamsSettings && !_conversationCache.ContainsUserId(course.TeamId))
+                {
+                    await InstallTrainingBotForTeam(course.TeamId, turnContext.Activity.Conversation.TenantId, Config.MicrosoftAppId, Config.MicrosoftAppPassword, Config.AppCatalogTeamAppId);
+
+                    var credentials = new MicrosoftAppCredentials(Config.MicrosoftAppId, Config.MicrosoftAppPassword);
+                    var message = MessageFactory.Text("This will start a new thread in a channel");
+
+                    var conversationParameters = new ConversationParameters
+                    {
+                        IsGroup = true,
+                        ChannelData = new { channel = new { id = course.TeamChannelId } },
+                        Activity = (Activity)message,
+                    };
+
+                    ConversationReference conversationReference = null;
+
+                    await ((Microsoft.Bot.Builder.Integration.AspNet.Core.CloudAdapter)turnContext.Adapter).CreateConversationAsync(
+                        Config.MicrosoftAppId,
+                        course.TeamId,
+                        turnContext.Activity.ServiceUrl,
+                        credentials.OAuthScope,
+                        conversationParameters,
+                        (t, ct) =>
+                        {
+                            conversationReference = t.Activity.GetConversationReference();
+                            return Task.CompletedTask;
+                        },
+                        cancellationToken);
+
+                }
+
                 // Get attendee info for this user
                 var userAttendeeInfoForCourse = userPendingActionsForCourse.Actions
                     .Where(a => a.Course == course)
@@ -239,7 +272,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                     throw new BotSharePointAccessException();
                 }
             }
-            
+
 
             var coursesThisUserIsLeading = allTrainingData.Courses.Where(c => c.Trainer?.Email?.ToLower() == trainerEmail.ToLower()).ToList();
 
@@ -291,7 +324,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
 
                 try
                 {
-                    await InstallTrainingBotForTarget(user.Id,
+                    await InstallTrainingBotForUser(user.Id,
                         tenantId,
                         Config.MicrosoftAppId,
                         Config.MicrosoftAppPassword,
@@ -305,7 +338,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                     }
                     throw;
                 }
-                
+
             }
 
             return pendingTrainingActionsForCoursesThisUserIsTeaching;
@@ -314,7 +347,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
         /// <summary>
         /// Install the app so we can get a conversation reference. 
         /// </summary>
-        async Task InstallTrainingBotForTarget(string userid, string tenantId, string appId, string appPassword, string teamAppid)
+        async Task InstallTrainingBotForUser(string userid, string tenantId, string appId, string appPassword, string teamAppid)
         {
             string token = await GetToken(tenantId, appId, appPassword);
             var graphClient = GetAuthenticatedClient(token);
@@ -337,13 +370,42 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                 // This is where app is already installed but we don't have conversation reference.
                 if (ex.Error.Code == "Conflict")
                 {
-                    await TriggerConversationUpdate(userid, tenantId, appId, appPassword);
+                    await TriggerUserConversationUpdate(userid, tenantId, appId, appPassword);
                 }
                 else throw;
             }
         }
 
-        async Task TriggerConversationUpdate(string userid, string tenantId, string appId, string appPassword)
+        async Task InstallTrainingBotForTeam(string teamId, string tenantId, string appId, string appPassword, string teamAppid)
+        {
+            string token = await GetToken(tenantId, appId, appPassword);
+            var graphClient = GetAuthenticatedClient(token);
+
+            try
+            {
+                var userScopeTeamsAppInstallation = new UserScopeTeamsAppInstallation
+                {
+                    AdditionalData = new Dictionary<string, object>()
+                    {
+                        {"teamsApp@odata.bind", "https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/"+teamAppid}
+                    }
+                };
+                await graphClient.Teams[teamId].InstalledApps
+                    .Request()
+                    .AddAsync(userScopeTeamsAppInstallation);
+            }
+            catch (ServiceException ex)
+            {
+                // This is where app is already installed but we don't have conversation reference.
+                if (ex.Error.Code == "Conflict")
+                {
+                    await TriggerUserConversationUpdate(teamId, tenantId, appId, appPassword);
+                }
+                else throw;
+            }
+        }
+
+        async Task TriggerUserConversationUpdate(string userid, string tenantId, string appId, string appPassword)
         {
             string accessToken = await GetToken(tenantId, appId, appPassword);
             GraphServiceClient graphClient = GetAuthenticatedClient(accessToken);
