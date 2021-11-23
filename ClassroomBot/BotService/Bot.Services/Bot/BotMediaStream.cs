@@ -34,7 +34,7 @@ namespace RecordingBot.Services.Bot
         /// <summary>
         /// The event publisher
         /// </summary>
-        private readonly ILogger<BotService> _eventPublisher;
+        private readonly IGraphLogger _logger;
 
         /// <summary>
         /// The call identifier
@@ -70,6 +70,7 @@ namespace RecordingBot.Services.Bot
 
             this.participants = new List<IParticipant>();
 
+            _logger = logger;
             _callId = callId;
             _mediaStream = new MediaStream(
                 settings,
@@ -113,14 +114,14 @@ namespace RecordingBot.Services.Bot
         {
             await _mediaStream.End();
             // Event - Stop media occurs when the call stops recording
-            _eventPublisher.LogInformation("StopMediaStream - Call stopped recording");
+            _logger.Info("StopMediaStream - Call stopped recording");
         }
 
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)
         {
             // Event Dispose of the bot media stream object
-            _eventPublisher.LogInformation("MediaStreamDispose");
+            _logger.Info("MediaStreamDispose");
 
             base.Dispose(disposing);
 
