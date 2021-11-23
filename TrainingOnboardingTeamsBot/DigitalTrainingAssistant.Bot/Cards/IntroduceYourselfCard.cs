@@ -17,7 +17,7 @@ namespace DigitalTrainingAssistant.Bot.Cards
 
         public override string GetCardContent()
         {
-            var json = Properties.Resources.IntroduceYourself;
+            var json = ReadResource(CardConstants.CardFileNameIntroduceYourself);
 
             json = base.ReplaceVal(json, CardConstants.FIELD_NAME_SHAREPOINT_ID, this.InfoToUpdate.ID.ToString());
 

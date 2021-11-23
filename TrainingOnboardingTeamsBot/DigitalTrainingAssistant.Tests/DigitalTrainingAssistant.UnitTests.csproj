@@ -33,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DigitalTrainingAssistant.Bot\DigitalTrainingAssistant.Bot.csproj" />
     <ProjectReference Include="..\DigitalTrainingAssistant.Models\DigitalTrainingAssistant.Models.csproj" />
   </ItemGroup>
 

@@ -19,7 +19,7 @@ namespace DigitalTrainingAssistant.Bot.Cards
 
         public override string GetCardContent()
         {
-            var json = Properties.Resources.AttendeeFixedQuestionsPublication;
+            var json = ReadResource(CardConstants.CardFileNameAttendeeFixedQuestionsPublication);
 
             json = base.ReplaceVal(json, CardConstants.FIELD_NAME_ATTENDEE_NAME, this.Info.User.Name);
             json = base.ReplaceVal(json, CardConstants.FIELD_NAME_ATTENDEE_EMAIL, this.Info.User.Email);

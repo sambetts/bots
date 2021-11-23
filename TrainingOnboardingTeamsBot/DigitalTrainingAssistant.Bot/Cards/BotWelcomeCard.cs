@@ -19,7 +19,7 @@ namespace DigitalTrainingAssistant.Bot.Cards
         
         public override string GetCardContent()
         {
-            var json = Properties.Resources.BotIntroduction;
+            var json = ReadResource(CardConstants.CardFileNameBotIntroduction);
 
             json = base.ReplaceVal(json, CardConstants.FIELD_NAME_BOT_NAME, this.BotName);
 

@@ -16,6 +16,26 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Cards\Templates\AttendeeFixedQuestionsInput.json" />
+    <Content Remove="Cards\Templates\AttendeeFixedQuestionsPublication.json" />
+    <Content Remove="Cards\Templates\BotIntroduction.json" />
+    <Content Remove="Cards\Templates\CourseWelcome.json" />
+    <Content Remove="Cards\Templates\IntroduceYourself.json" />
+    <Content Remove="Cards\Templates\LearnerQuestions.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Cards\Templates\AttendeeFixedQuestionsInput.json" />
+    <EmbeddedResource Include="Cards\Templates\AttendeeFixedQuestionsPublication.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Cards\Templates\BotIntroduction.json" />
+    <EmbeddedResource Include="Cards\Templates\CourseWelcome.json" />
+    <EmbeddedResource Include="Cards\Templates\IntroduceYourself.json" />
+    <EmbeddedResource Include="Cards\Templates\LearnerQuestions.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AdaptiveCards" Version="2.7.2" />
     <PackageReference Include="Azure.Data.Tables" Version="12.2.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.18.0" />
@@ -39,23 +59,5 @@
     <Content Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="Cards\Templates\AttendeeFixedQuestionsPublication.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
 </Project>

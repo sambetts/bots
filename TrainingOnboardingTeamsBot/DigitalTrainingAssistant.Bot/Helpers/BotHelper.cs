@@ -66,39 +66,9 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                 // Install bot to course Team if there is one
                 if (course.HasValidTeamsSettings)
                 {
+                    // Todo: check app installation 1st
                     await InstallTrainingBotForTeam(course.TeamId, Config.TenantId, Config.MicrosoftAppId, Config.MicrosoftAppPassword, Config.AppCatalogTeamAppId);
 
-                    var credentials = new MicrosoftAppCredentials(Config.MicrosoftAppId, Config.MicrosoftAppPassword);
-                    var message = MessageFactory.Text("This will start a new thread in a channel");
-
-                    var conversationParameters = new ConversationParameters
-                    {
-                        IsGroup = true,
-                        ChannelData = new { channel = new { id = course.TeamChannelId } },
-                        Activity = (Activity)message,
-                    };
-
-                    ConversationReference conversationReference = null;
-
-                    try
-                    {
-                        await turnContext.Adapter.CreateConversationAsync(
-                            Config.MicrosoftAppId,
-                            course.TeamId,
-                            turnContext.Activity.ServiceUrl,
-                            credentials.OAuthScope,
-                            conversationParameters,
-                            (t, ct) =>
-                            {
-                                conversationReference = t.Activity.GetConversationReference();
-                                return Task.CompletedTask;
-                            },
-                            cancellationToken);
-                    }
-                    catch (ErrorResponseException ex)
-                    {
-                        await turnContext.SendActivityAsync(MessageFactory.Text($"Couldn't update the team - {ex.Message}"), cancellationToken);
-                    }
                 }
 
                 // Get attendee info for this user
@@ -213,7 +183,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
 
 
                     // Send back to user for now
-                    await stepContext.Context.SendActivityAsync(MessageFactory.Text("Saved. Now post it to the Team..."));
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text("Saved. Now let's introduce you to the Team..."));
 
                     return null;
                 }
