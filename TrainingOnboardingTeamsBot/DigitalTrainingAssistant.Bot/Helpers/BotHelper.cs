@@ -64,9 +64,9 @@ namespace DigitalTrainingAssistant.Bot.Helpers
             foreach (var course in userPendingActionsForCourse.UniqueCourses)
             {
                 // Install bot to course Team if there is one
-                if (course.HasValidTeamsSettings && !_conversationCache.ContainsUserId(course.TeamId))
+                if (course.HasValidTeamsSettings)
                 {
-                    await InstallTrainingBotForTeam(course.TeamId, turnContext.Activity.Conversation.TenantId, Config.MicrosoftAppId, Config.MicrosoftAppPassword, Config.AppCatalogTeamAppId);
+                    await InstallTrainingBotForTeam(course.TeamId, Config.TenantId, Config.MicrosoftAppId, Config.MicrosoftAppPassword, Config.AppCatalogTeamAppId);
 
                     var credentials = new MicrosoftAppCredentials(Config.MicrosoftAppId, Config.MicrosoftAppPassword);
                     var message = MessageFactory.Text("This will start a new thread in a channel");
@@ -80,19 +80,25 @@ namespace DigitalTrainingAssistant.Bot.Helpers
 
                     ConversationReference conversationReference = null;
 
-                    await ((Microsoft.Bot.Builder.Integration.AspNet.Core.CloudAdapter)turnContext.Adapter).CreateConversationAsync(
-                        Config.MicrosoftAppId,
-                        course.TeamId,
-                        turnContext.Activity.ServiceUrl,
-                        credentials.OAuthScope,
-                        conversationParameters,
-                        (t, ct) =>
-                        {
-                            conversationReference = t.Activity.GetConversationReference();
-                            return Task.CompletedTask;
-                        },
-                        cancellationToken);
-
+                    try
+                    {
+                        await turnContext.Adapter.CreateConversationAsync(
+                            Config.MicrosoftAppId,
+                            course.TeamId,
+                            turnContext.Activity.ServiceUrl,
+                            credentials.OAuthScope,
+                            conversationParameters,
+                            (t, ct) =>
+                            {
+                                conversationReference = t.Activity.GetConversationReference();
+                                return Task.CompletedTask;
+                            },
+                            cancellationToken);
+                    }
+                    catch (ErrorResponseException ex)
+                    {
+                        await turnContext.SendActivityAsync(MessageFactory.Text($"Couldn't update the team - {ex.Message}"), cancellationToken);
+                    }
                 }
 
                 // Get attendee info for this user
@@ -102,26 +108,30 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                         .Where(a => a.User.Email == toUser.EmailAddress).FirstOrDefault();
 
                 // Send course intro?
-                if (!userAttendeeInfoForCourse.BotContacted && course.HasValidTeamsSettings)
+                if (userAttendeeInfoForCourse != null)
                 {
-                    await turnContext.SendActivityAsync(MessageFactory.Attachment(new CourseWelcomeCard(BotConstants.BotName, course).GetCard()), cancellationToken);
+                    if (!userAttendeeInfoForCourse.BotContacted && course.HasValidTeamsSettings)
+                    {
+                        await turnContext.SendActivityAsync(MessageFactory.Attachment(new CourseWelcomeCard(BotConstants.BotName, course).GetCard()), cancellationToken);
 
-                    // Don't send course intro twice to same user
-                    userAttendeeInfoForCourse.BotContacted = true;
-                    await userAttendeeInfoForCourse.SaveChanges(graphClient, Config.SharePointSiteId);
+                        // Don't send course intro twice to same user
+                        userAttendeeInfoForCourse.BotContacted = true;
+                        await userAttendeeInfoForCourse.SaveChanges(graphClient, Config.SharePointSiteId);
+                    }
+
+                    // Personal introduction needed?
+                    if (!userAttendeeInfoForCourse.IntroductionDone)
+                    {
+                        await turnContext.SendActivityAsync(MessageFactory.Attachment(new IntroduceYourselfCard(userAttendeeInfoForCourse).GetCard()), cancellationToken);
+                    }
+
+                    // Send outstanding course actions
+                    var actionsForCourse = userPendingActionsForCourse.Actions.Where(a => a.Course == course);
+                    var coursePendingItemsAttachment = new LearningPlanListCard(actionsForCourse, course).GetCard();
+
+                    await turnContext.SendActivityAsync(MessageFactory.Attachment(coursePendingItemsAttachment), cancellationToken);
                 }
 
-                // Personal introduction needed?
-                if (!userAttendeeInfoForCourse.IntroductionDone)
-                {
-                    await turnContext.SendActivityAsync(MessageFactory.Attachment(new IntroduceYourselfCard(userAttendeeInfoForCourse).GetCard()), cancellationToken);
-                }
-
-                // Send outstanding course actions
-                var actionsForCourse = userPendingActionsForCourse.Actions.Where(a => a.Course == course);
-                var coursePendingItemsAttachment = new LearningPlanListCard(actionsForCourse, course).GetCard();
-
-                await turnContext.SendActivityAsync(MessageFactory.Attachment(coursePendingItemsAttachment), cancellationToken);
             }
         }
 
@@ -399,7 +409,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                 // This is where app is already installed but we don't have conversation reference.
                 if (ex.Error.Code == "Conflict")
                 {
-                    await TriggerUserConversationUpdate(teamId, tenantId, appId, appPassword);
+                    //await TriggerUserConversationUpdate(teamId, tenantId, appId, appPassword);
                 }
                 else throw;
             }

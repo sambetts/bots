@@ -1,36 +1,38 @@
 {
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.11/MicrosoftTeams.schema.json",
-    "manifestVersion": "1.11",
     "version": "1.0.0",
-    "id": "<<GENERATE_NEW_GUID>>",
-    "packageName": "com.example.contoso",
-    "developer": {
-        "name": "contoso",
-        "websiteUrl": "https://www.contoso.com",
-        "privacyUrl": "https://www.contoso.com/privacy",
-        "termsOfUseUrl": "https://www.contoso.com/legal"
-    },
-    "icons": {
-        "color": "color.png",
-        "outline": "outline.png"
-    },
+    "manifestVersion": "1.11",
+    "id": "<<BOT_APP_ID>>",
+    "packageName": "com.package.name",
     "name": {
-        "short": "Digital Training Assistant",
-        "full": "Training Onboarding App for trainees"
+        "short": "Learning Companion",
+        "full": ""
+    },
+    "developer": {
+        "name": "Contoso, Inc.",
+        "mpnId": "",
+        "websiteUrl": "https://constoso.com",
+        "privacyUrl": "https://constoso.com",
+        "termsOfUseUrl": "https://constoso.com"
     },
     "description": {
-        "short": "Samples of Proactive Messaging in Teams",
-        "full": "Samples for getting conversation coordinates and sending proactive messages in Microsoft Teams."
+        "short": "The Learning companion is here to help you stay on track with your courses",
+        "full": "The Learning companion bot is here to help you stay on track with your courses, by sending you reminders and helping you stay on top of your pending tasks"
     },
-    "accentColor": "#FFFFFF",
+    "icons": {
+        "outline": "outline.png",
+        "color": "color.png"
+    },
+    "accentColor": "#7B83EB",
     "bots": [
         {
             "botId": "<<BOT_APP_ID>>",
             "scopes": [
+                "team",
                 "personal"
-            ],
-            "supportsFiles": false,
-            "isNotificationOnly": false
+              ],
+            "isNotificationOnly": false,
+            "supportsFiles": false
         }
     ],
     "permissions": [
