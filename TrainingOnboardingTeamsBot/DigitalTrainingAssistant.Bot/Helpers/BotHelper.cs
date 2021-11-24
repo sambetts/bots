@@ -89,15 +89,9 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                         await userAttendeeInfoForCourse.SaveChanges(graphClient, Config.SharePointSiteId);
                     }
 
-                    // Personal introduction needed?
-                    if (!userAttendeeInfoForCourse.IntroductionDone)
-                    {
-                        await turnContext.SendActivityAsync(MessageFactory.Attachment(new IntroduceYourselfCard(userAttendeeInfoForCourse).GetCard()), cancellationToken);
-                    }
-
                     // Send outstanding course actions
                     var actionsForCourse = userPendingActionsForCourse.Actions.Where(a => a.Course == course);
-                    var coursePendingItemsAttachment = new LearningPlanListCard(actionsForCourse, course).GetCard();
+                    var coursePendingItemsAttachment = new PendingTasksListCard(userAttendeeInfoForCourse, actionsForCourse, course).GetCard();
 
                     await turnContext.SendActivityAsync(MessageFactory.Attachment(coursePendingItemsAttachment), cancellationToken);
                 }

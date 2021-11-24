@@ -33,9 +33,5 @@ namespace DigitalTrainingAssistant.Bot.Cards
 
             return json;
         }
-
-
     }
-
-
 }

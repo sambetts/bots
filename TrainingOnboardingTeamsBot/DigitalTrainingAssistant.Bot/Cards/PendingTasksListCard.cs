@@ -8,17 +8,22 @@ namespace DigitalTrainingAssistant.Bot.Cards
     /// <summary>
     /// Class that helps to create learning plan list card.
     /// </summary>
-    public class LearningPlanListCard : BaseAdaptiveCard
+    public class PendingTasksListCard : BaseAdaptiveCard
     {
-        public LearningPlanListCard(IEnumerable<PendingUserActionsForCourse> actionsPending, Course course)
+        public PendingTasksListCard(CourseAttendance userAttendeeInfoForCourse, IEnumerable<PendingUserActionsForCourse> actionsPending, Course course)
         {
             this.ActionsPending = actionsPending;
             this.Course = course;
+            this.UserAttendeeInfoForCourse = userAttendeeInfoForCourse;
         }
+
+        #region Props
 
         public IEnumerable<PendingUserActionsForCourse> ActionsPending { get; set; }
         public Course Course { get; set; }
+        public CourseAttendance UserAttendeeInfoForCourse { get; set; }
 
+        #endregion
 
         public override string GetCardContent()
         {
@@ -71,6 +76,27 @@ namespace DigitalTrainingAssistant.Bot.Cards
                     new AdaptiveSubmitAction{ Title= "Set Tasks Complete", DataJson="{\"" + CardConstants.CardActionPropName + "\":\"" + CardConstants.CardActionValLearnerTasksDone + "\"}" }
                 }
             };
+
+            if (!UserAttendeeInfoForCourse.IntroductionDone)
+            {
+                card.Body.Insert(1, new AdaptiveContainer
+                {
+                    Items = new List<AdaptiveElement>()
+                    {
+                        new AdaptiveTextBlock{ Text= "Meet and greet your colleagues in the program" },
+                        new AdaptiveActionSet{
+                            Actions = new List<AdaptiveAction> {
+                                new AdaptiveSubmitAction
+                                { 
+                                    Type = "Action.Submit", 
+                                    Title = "Introduce Yourself",
+                                    Data = new { action = "StartIntroduction", SPID = this.UserAttendeeInfoForCourse.ID }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
 
             return Newtonsoft.Json.JsonConvert.SerializeObject(card);
         }
