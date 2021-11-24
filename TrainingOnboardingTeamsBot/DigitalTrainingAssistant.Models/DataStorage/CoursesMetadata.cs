@@ -99,7 +99,14 @@ namespace DigitalTrainingAssistant.Models
             }
             catch (ServiceException ex)
             {
-                throw ex;
+                if (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                {
+                    throw new BotSharePointAccessException();
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
 

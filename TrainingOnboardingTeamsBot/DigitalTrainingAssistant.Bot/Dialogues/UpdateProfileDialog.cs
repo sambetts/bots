@@ -92,7 +92,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
             if (!courseAttendance.IntroductionDone)
             {
                 // Update questionnaire
-                await _botHelper.HandleCardResponse(stepContext, stepContext.Context.Activity.Value?.ToString(), cancellationToken);
+                await MainDialog.HandleCardResponse(stepContext, stepContext.Context.Activity.Value?.ToString(), cancellationToken, _botConfig);
             }
 
             if (courseAttendance.ParentCourse.HasValidTeamsSettings)

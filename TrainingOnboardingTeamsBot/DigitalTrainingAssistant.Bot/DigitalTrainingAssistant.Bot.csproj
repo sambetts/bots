@@ -20,7 +20,6 @@
     <Content Remove="Cards\Templates\AttendeeFixedQuestionsPublication.json" />
     <Content Remove="Cards\Templates\BotIntroduction.json" />
     <Content Remove="Cards\Templates\CourseWelcome.json" />
-    <Content Remove="Cards\Templates\IntroduceYourself.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,7 +29,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Cards\Templates\BotIntroduction.json" />
     <EmbeddedResource Include="Cards\Templates\CourseWelcome.json" />
-    <EmbeddedResource Include="Cards\Templates\IntroduceYourself.json" />
   </ItemGroup>
 
   <ItemGroup>

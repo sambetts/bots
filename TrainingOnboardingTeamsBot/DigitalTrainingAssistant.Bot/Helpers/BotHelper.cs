@@ -4,7 +4,6 @@ using DigitalTrainingAssistant.Bot.Models;
 using DigitalTrainingAssistant.Models;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
@@ -114,95 +113,6 @@ namespace DigitalTrainingAssistant.Bot.Helpers
             return await RemindClassMembersWithOutstandingTasks(turnContext.Adapter, userTalkingEmail.EmailAddress, turnContext.Activity.Conversation.TenantId, cancellationToken, filterByCourseReminderDays);
         }
 
-
-
-        /// <summary>
-        /// Someone replied via an Adaptive card form
-        /// </summary>
-        public async Task<DialogTurnResult> HandleCardResponse(WaterfallStepContext stepContext, string submitJson, CancellationToken cancellationToken)
-        {
-            // Form action
-            ActionResponse r = null;
-
-            try
-            {
-                r = JsonConvert.DeserializeObject<ActionResponse>(submitJson);
-            }
-            catch (JsonException)
-            {
-                return await ReplyWithNoIdeaAndEndDiag(stepContext, cancellationToken);
-            }
-
-            // Figure out what was done
-            if (r.Action == CardConstants.CardActionValLearnerTasksDone)
-            {
-                var update = new CourseTasksUpdateInfo(submitJson, stepContext.Context.Activity.From.AadObjectId);
-                await update.SendReply(stepContext.Context, cancellationToken, Config.MicrosoftAppId, Config.MicrosoftAppPassword, Config.SharePointSiteId);
-
-            }
-            else if (r.Action == CardConstants.CardActionValStartIntroduction)
-            {
-                var spAction = JsonConvert.DeserializeObject<ActionResponseForSharePointItem>(submitJson);
-
-                var token = await AuthHelper.GetToken(stepContext.Context.Activity.Conversation.TenantId, Config.MicrosoftAppId, Config.MicrosoftAppPassword);
-                var graphClient = AuthHelper.GetAuthenticatedClient(token);
-
-                var attendanceInfo = await CourseAttendance.LoadById(graphClient, Config.SharePointSiteId, spAction.SPID);
-
-
-                return await stepContext.BeginDialogAsync(nameof(UpdateProfileDialog), attendanceInfo, cancellationToken);
-
-            }
-            else if (r.Action == CardConstants.CardActionValSaveIntroductionQuestions)
-            {
-                var introductionData = JsonConvert.DeserializeObject<IntroduceYourselfResponse>(submitJson);
-
-                var token = await AuthHelper.GetToken(stepContext.Context.Activity.Conversation.TenantId, Config.MicrosoftAppId, Config.MicrosoftAppPassword);
-                var graphClient = AuthHelper.GetAuthenticatedClient(token);
-
-                var attendanceInfo = await CourseAttendance.LoadById(graphClient, Config.SharePointSiteId, introductionData.SPID);
-                if (introductionData.IsValid)
-                {
-                    // Save intro data
-                    attendanceInfo.QACountry = introductionData.Country;
-                    attendanceInfo.QAMobilePhoneNumber = introductionData.MobilePhoneNumber;
-                    attendanceInfo.QAOrg = introductionData.Org;
-                    attendanceInfo.QARole = introductionData.Role;
-                    attendanceInfo.QASpareTimeActivities = introductionData.SpareTimeActivities;
-                    attendanceInfo.IntroductionDone = true;
-
-#if !DEBUG
-                    await attendanceInfo.SaveChanges(graphClient, Config.SharePointSiteId);
-#endif
-
-
-                    // Send back to user for now
-                    await stepContext.Context.SendActivityAsync(MessageFactory.Text("Saved. Now let's introduce you to the Team..."));
-
-                    return null;
-                }
-                else
-                {
-                    await stepContext.Context.SendActivityAsync(MessageFactory.Text(
-                        $"Oops, that doesn't seem right - check the values & try again?"
-                        ), cancellationToken);
-                }
-            }
-
-            // Something else
-            return await ReplyWithNoIdeaAndEndDiag(stepContext, cancellationToken);
-
-        }
-
-        private async Task<DialogTurnResult> ReplyWithNoIdeaAndEndDiag(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text(
-                    $"You sent me something but I can't work out what, sorry! Try again?."
-                    ), cancellationToken);
-            return await stepContext.EndDialogAsync(null);
-        }
-
         async Task<bool> CheckIfUserHasActionsAndSendMessagesIfNeeded(CachedUserAndConversationData user, PendingUserActions userPendingActions, BotAdapter botAdapter, GraphServiceClient graphClient, CancellationToken cancellationToken)
         {
             // Does this user have any training actions?
@@ -234,18 +144,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
             var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
             // Load all course data from lists
-            CoursesMetadata allTrainingData = null;
-            try
-            {
-                allTrainingData = await CoursesMetadata.LoadTrainingSPData(graphClient, Config.SharePointSiteId);
-            }
-            catch (ServiceException ex)
-            {
-                if (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                {
-                    throw new BotSharePointAccessException();
-                }
-            }
+            var allTrainingData = await CoursesMetadata.LoadTrainingSPData(graphClient, Config.SharePointSiteId);
 
 
             var coursesThisUserIsLeading = allTrainingData.Courses.Where(c => c.Trainer?.Email?.ToLower() == trainerEmail.ToLower()).ToList();

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DigitalTrainingAssistant.Bot
+namespace DigitalTrainingAssistant.Models
 {
     public abstract class BotException : Exception
     {
