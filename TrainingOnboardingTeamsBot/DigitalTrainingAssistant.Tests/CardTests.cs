@@ -14,10 +14,18 @@ namespace DigitalTrainingAssistant.Tests
         public void SimpleCardLoadTest()
         {
 
-            var attendeeFixedQuestionsInputCard = new AttendeeFixedQuestionsInputCard(new Models.CourseAttendance { });
+            var botWelcomeCard = new BotWelcomeCard("Botulus Bob");
+            Assert.IsNotNull(botWelcomeCard.GetCardContent());
+
+            var attendeeFixedQuestionsInputCard = new AttendeeFixedQuestionsInputCard(new CourseAttendance { });
             Assert.IsNotNull(attendeeFixedQuestionsInputCard.GetCardContent());
 
             var course = new Course { };
+
+
+            var courseWelcomeCard = new CourseWelcomeCard("Botulus Bob", course);
+            Assert.IsNotNull(courseWelcomeCard.GetCardContent());
+
             var attendance = new CourseAttendance
             {
                 ParentCourse = course,
@@ -28,7 +36,7 @@ namespace DigitalTrainingAssistant.Tests
                 }
             };
 
-            var c = new PendingTasksListCard(attendance,
+            var pendingTasksListCard = new PendingTasksListCard(attendance,
                 new List<PendingUserActionsForCourse>
                 {
                     new PendingUserActionsForCourse
@@ -40,7 +48,7 @@ namespace DigitalTrainingAssistant.Tests
                 course
             );
 
-            Assert.IsNotNull(c.GetCardContent());
+            Assert.IsNotNull(pendingTasksListCard.GetCardContent());
 
         }
     }

@@ -102,8 +102,10 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
                             await attendance.SaveChanges(graphClient, _configuration.SharePointSiteId);
                             removeCount++;
                         }
-                        
                     }
+
+                    // Remove conversation cache
+                    await _botConversationCache.RemoveFromCache(conversationReference.User.AadObjectId);
 
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text(
                             $"Forgot you from {removeCount} courses."
@@ -170,7 +172,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
                     attendanceInfo.IntroductionDone = true;
 
 #if !DEBUG
-                    await attendanceInfo.SaveChanges(graphClient, Config.SharePointSiteId);
+                    await attendanceInfo.SaveChanges(graphClient, _configuration.SharePointSiteId);
 #endif
 
 

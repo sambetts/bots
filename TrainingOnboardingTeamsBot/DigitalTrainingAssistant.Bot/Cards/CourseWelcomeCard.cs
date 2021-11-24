@@ -23,8 +23,8 @@ namespace DigitalTrainingAssistant.Bot.Cards
 
             json = base.ReplaceVal(json, CardConstants.FIELD_NAME_COURSE_NAME, this.Course.Name);
             json = base.ReplaceVal(json, CardConstants.FIELD_NAME_BOT_NAME, this.BotName);
-            json = base.ReplaceVal(json, CardConstants.FIELD_NAME_TRAINER_NAME, Course.Trainer.Name);
-            json = base.ReplaceVal(json, CardConstants.FIELD_NAME_COURSE_INTRO_TEXT, Course.WelcomeMessage);
+            json = base.ReplaceVal(json, CardConstants.FIELD_NAME_TRAINER_NAME, Course?.Trainer?.Name);
+            json = base.ReplaceVal(json, CardConstants.FIELD_NAME_COURSE_INTRO_TEXT, Course?.WelcomeMessage);
 
             return json;
         }

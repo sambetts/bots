@@ -66,7 +66,18 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                 if (course.HasValidTeamsSettings)
                 {
                     // Todo: check app installation 1st
-                    await InstallTrainingBotForTeam(course.TeamId, Config.TenantId, Config.MicrosoftAppId, Config.MicrosoftAppPassword, Config.AppCatalogTeamAppId);
+                    try
+                    {
+                        await InstallTrainingBotForTeam(course.TeamId, Config.TenantId, Config.MicrosoftAppId, Config.MicrosoftAppPassword, Config.AppCatalogTeamAppId);
+                    }
+                    catch (ServiceException ex)
+                    {
+                        if (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                        {
+                            throw new GraphAccessException("I don't seem to have permissions to install to the associated Team to publish introductions. (TeamsAppInstallation.ReadWriteForTeam.All)");
+                        }
+
+                    }
 
                 }
 

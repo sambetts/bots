@@ -52,7 +52,14 @@ namespace DigitalTrainingAssistant.Bot
                         await turnContext.SendActivityAsync(MessageFactory.Attachment(introCardAttachment));
 
                         // Send outstanding tasks
-                        await _helper.SendCourseIntroAndTrainingRemindersToUser(user, turnContext, cancellationToken, pendingTrainingActions, graphClient);
+                        try
+                        {
+                            await _helper.SendCourseIntroAndTrainingRemindersToUser(user, turnContext, cancellationToken, pendingTrainingActions, graphClient);
+                        }
+                        catch (GraphAccessException ex)
+                        {
+                            await turnContext.SendActivityAsync(MessageFactory.Text(ex.Message));
+                        }
                     }
                 }
             }

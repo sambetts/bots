@@ -26,12 +26,12 @@ namespace DigitalTrainingAssistant.Bot.Cards
         public static string FIELD_NAME_QASpareTimeActivities => "${QASpareTimeActivities}";
         public static string FIELD_NAME_QAMobilePhoneNumber => "${QAMobilePhoneNumber}";
 
-        public static string CardFileNameAttendeeFixedQuestionsInput => "AttendeeFixedQuestionsInput.json";
-        public static string CardFileNameAttendeeFixedQuestionsPublication => "AttendeeFixedQuestionsPublication.json";
-        public static string CardFileNameBotIntroduction => "BotIntroduction.json";
-        public static string CardFileNameCourseWelcome => "CourseWelcome.json";
-        public static string CardFileNameIntroduceYourself => "IntroduceYourself.json";
-        public static string CardFileNameLearnerQuestions => "LearnerQuestions.json";
+        public static string CardFileNameAttendeeFixedQuestionsInput => "DigitalTrainingAssistant.Bot.Cards.Templates.AttendeeFixedQuestionsInput.json";
+        public static string CardFileNameAttendeeFixedQuestionsPublication => "DigitalTrainingAssistant.Bot.Cards.Templates.AttendeeFixedQuestionsPublication.json";
+        public static string CardFileNameBotIntroduction => "DigitalTrainingAssistant.Bot.Cards.Templates.BotIntroduction.json";
+        public static string CardFileNameCourseWelcome => "DigitalTrainingAssistant.Bot.Cards.Templates.CourseWelcome.json";
+        public static string CardFileNameIntroduceYourself => "DigitalTrainingAssistant.Bot.Cards.Templates.IntroduceYourself.json";
+        public static string CardFileNameLearnerQuestions => "DigitalTrainingAssistant.Bot.Cards.Templates.LearnerQuestions.json";
 
 
         public const string CardActionPropName = "action";

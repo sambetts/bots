@@ -22,30 +22,26 @@ namespace DigitalTrainingAssistant.Bot.Cards
             return json;
         }
 
-        protected string ReadResource(string name)
+        protected string ReadResource(string resourcePath)
         {
-            // Determine path
             var assembly = Assembly.GetExecutingAssembly();
-            string resourcePath = name;
+
             // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
-            if (!name.StartsWith(nameof(DigitalTrainingAssistant.Bot)))
-            {
-                var manifests = assembly.GetManifestResourceNames();
-                if (manifests.Any(str => str.EndsWith(name)))
+            var manifests = assembly.GetManifestResourceNames();
+
+
+            using (var stream = assembly.GetManifestResourceStream(resourcePath))
+                if (stream != null)
                 {
-                    resourcePath = manifests.Single(str => str.EndsWith(name));
+                    using (var reader = new StreamReader(stream))
+                    {
+                        return reader.ReadToEnd();
+                    }
                 }
                 else
                 {
-                    throw new ArgumentOutOfRangeException(nameof(name));
+                    throw new ArgumentOutOfRangeException(nameof(resourcePath), $"No resource found by name '{resourcePath}'");
                 }
-            }
-
-            using (Stream stream = assembly.GetManifestResourceStream(resourcePath))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                return reader.ReadToEnd();
-            }
         }
         public Attachment GetCard()
         {
