@@ -54,17 +54,25 @@ namespace DigitalTrainingAssistant.Models
 
         #endregion
 
-        public static async Task<Course> LoadById(GraphServiceClient graphClient, string siteId, int sPID)
+        public static async Task<Course> LoadById(GraphServiceClient graphClient, string siteId, int courseSharePointId)
         {
-            if (sPID < 1)
+            if (courseSharePointId < 1)
             {
-                throw new ArgumentOutOfRangeException(nameof(sPID));
+                throw new ArgumentOutOfRangeException(nameof(courseSharePointId), "Cannot load unsaved course");
             }
-            var courseList = await Utils.GetList(siteId, ModelConstants.ListNameCourses, graphClient);
-            var courseItem = await graphClient.Sites[siteId].Lists[courseList.Id].Items[sPID.ToString()].Request().Expand("fields").GetAsync();
+
+            var spCache = new SPCache(siteId, graphClient);
+
+            var courseList = await spCache.GetList(ModelConstants.ListNameCourses);
+            var courseItem = await graphClient.Sites[siteId].Lists[courseList.Id].Items[courseSharePointId.ToString()].Request().Expand("fields").GetAsync();
             var allUsers = await CoursesMetadata.LoadSiteUsers(graphClient, siteId);
 
             return new Course(courseItem, allUsers);
+        }
+
+        public override string ToString()
+        {
+            return $"{this.Name}";
         }
     }
 }

@@ -48,6 +48,10 @@ namespace DigitalTrainingAssistant.Models
         {
             return new PendingUserActions { Actions = Actions.Where(a => a.Attendee.User.Email.ToLower() == email.ToLower()).ToList() };
         }
+        public override string ToString()
+        {
+            return $"{this.UniqueUsers.Count} users pending {this.Actions.Count} actions, across {this.UniqueCourses.Count} courses";
+        }
     }
 
 

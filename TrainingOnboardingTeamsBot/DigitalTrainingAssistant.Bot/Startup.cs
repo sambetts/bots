@@ -13,6 +13,7 @@ using DigitalTrainingAssistant.Bot.Dialogues;
 using DigitalTrainingAssistant.Bot.Services;
 using DigitalTrainingAssistant.Bot.Helpers;
 using Microsoft.Bot.Connector.Authentication;
+using DigitalTrainingAssistant.Models;
 
 namespace Microsoft.BotBuilderSamples
 {

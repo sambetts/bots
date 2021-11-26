@@ -1,5 +1,6 @@
 ﻿using Azure;
 using Azure.Data.Tables;
+using DigitalTrainingAssistant.Models;
 using Microsoft.Bot.Schema;
 using Microsoft.Graph;
 using System;

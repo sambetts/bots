@@ -170,15 +170,17 @@ namespace DigitalTrainingAssistant.Bot.Helpers
 
                     // Does this user have any custom training actions?
                     var thisUserPendingActions = pendingTrainingActionsForCoursesThisUserIsTeaching.GetActionsByEmail(user.EmailAddress);
-
-                    try
+                    if (thisUserPendingActions.Actions.Count > 0)
                     {
-                        await CheckIfUserHasActionsAndSendMessagesIfNeeded(user, thisUserPendingActions, botAdapter, graphClient, cancellationToken);
-                    }
-                    catch (ErrorResponseException)
-                    {
-                        // Something wierd happened resuming the conversation. Assume invalid conversation reference cache
-                        await _conversationCache.RemoveFromCache(user.RowKey);
+                        try
+                        {
+                            await CheckIfUserHasActionsAndSendMessagesIfNeeded(user, thisUserPendingActions, botAdapter, graphClient, cancellationToken);
+                        }
+                        catch (ErrorResponseException)
+                        {
+                            // Something wierd happened resuming the conversation. Assume invalid conversation reference cache
+                            await _conversationCache.RemoveFromCache(user.RowKey);
+                        }
                     }
                 }
             }

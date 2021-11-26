@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DigitalTrainingAssistant.Bot
+namespace DigitalTrainingAssistant.Models
 {
     public class BotConfig
     {

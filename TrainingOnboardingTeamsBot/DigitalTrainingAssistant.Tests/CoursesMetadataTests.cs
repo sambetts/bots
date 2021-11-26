@@ -1,4 +1,5 @@
 using DigitalTrainingAssistant.Models;
+using DigitalTrainingAssistant.UnitTests;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,7 +14,7 @@ namespace DigitalTrainingAssistant.Tests
     {
         #region Stuff
 
-        public IConfiguration _configuration;
+        private TestConfig _configuration;
 
         [TestInitialize]
         public void Init()
@@ -22,11 +23,11 @@ namespace DigitalTrainingAssistant.Tests
                 .SetBasePath(System.AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
-            _configuration = builder.Build();
+            _configuration = new TestConfig(builder.Build());
         }
         async Task<GraphServiceClient> GetClient()
         {
-            var token = await AuthHelper.GetToken(_configuration["TenantId"], _configuration["MicrosoftAppId"], _configuration["MicrosoftAppPassword"]);
+            var token = await AuthHelper.GetToken(_configuration.TenantId, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword);
             return AuthHelper.GetAuthenticatedClient(token);
         }
         #endregion
@@ -82,7 +83,7 @@ namespace DigitalTrainingAssistant.Tests
         public async Task CoursesMetadataLoadTrainingSPData()
         {
             var graphClient = await GetClient();
-            var meta = await CoursesMetadata.LoadTrainingSPData(graphClient, _configuration["SharePointSiteId"]);
+            var meta = await CoursesMetadata.LoadTrainingSPData(graphClient, _configuration.SharePointSiteId);
             Assert.IsNotNull(meta);
 
             Assert.IsTrue(meta.Courses.Count > 0);
@@ -94,7 +95,7 @@ namespace DigitalTrainingAssistant.Tests
         public async Task CourseAttendanceLoadById()
         {
             var graphClient = await GetClient();
-            var attendance = await CourseAttendance.LoadById(graphClient, _configuration["SharePointSiteId"], 1);
+            var attendance = await CourseAttendance.LoadById(graphClient, _configuration.SharePointSiteId, 1);
             Assert.IsNotNull(attendance);
 
             Assert.IsTrue(attendance.ParentCourse.ID != 0);
@@ -108,14 +109,24 @@ namespace DigitalTrainingAssistant.Tests
         {
             var graphClient = await GetClient();
 
-            var testInvalidUpdate = new CourseTasksUpdateInfo { UserAadObjectId = _configuration["TestUserAadObjectId"] };
+            var testInvalidUpdate = new CourseTasksUpdateInfo { UserAadObjectId = _configuration.TestUserAadObjectId };
             testInvalidUpdate.ConfirmedTaskIds.Add(233331);
-            await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(() => testInvalidUpdate.SaveChanges(graphClient, _configuration["SharePointSiteId"]));
+            await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(() => testInvalidUpdate.SaveChanges(graphClient, _configuration.SharePointSiteId));
 
-            var testUpdate = new CourseTasksUpdateInfo { UserAadObjectId = _configuration["TestUserAadObjectId"] };
-            testUpdate.ConfirmedTaskIds.Add(1);
+            // Phind phirst task
+            var spCache = new SPCache(_configuration.SharePointSiteId, graphClient);
+            var checkListList = await spCache.GetList(ModelConstants.ListNameCourseChecklist);
+            var firstRecordResult = await graphClient.Sites[_configuration.SharePointSiteId].Lists[checkListList.Id].Items.Request()
+                .Top(1)
+                .GetAsync();
+            if (firstRecordResult.Count < 1)
+            {
+                Assert.Fail("No checklist items found in site");
+            }
+            var testUpdate = new CourseTasksUpdateInfo { UserAadObjectId = _configuration.TestUserAadObjectId };
+            testUpdate.ConfirmedTaskIds.Add(int.Parse(firstRecordResult[0].Id));
 
-            await testUpdate.SaveChanges(graphClient, _configuration["SharePointSiteId"]);
+            await testUpdate.SaveChanges(graphClient, _configuration.SharePointSiteId);
         }
 
         /// <summary>
@@ -138,7 +149,7 @@ namespace DigitalTrainingAssistant.Tests
                 User = new SiteUser { Email = "AdeleV@M365x352268.OnMicrosoft.com", Name = "Adele" }
             };
 
-            await a.SaveChanges(graphClient, _configuration["SharePointSiteId"]);
+            await a.SaveChanges(graphClient, _configuration.SharePointSiteId);
         }
     }
 }

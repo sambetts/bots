@@ -11,6 +11,8 @@ namespace DigitalTrainingAssistant.Models
     /// </summary>
     public class CourseAttendance : BaseSPItemWithUser
     {
+        #region Constructors
+
         public CourseAttendance() { }
 
         public CourseAttendance(ListItem item, List<SiteUser> allUsers) : this(item, allUsers, new Course())       // Call default constructor
@@ -45,6 +47,7 @@ namespace DigitalTrainingAssistant.Models
             // Override parent-course
             this.ParentCourse = allCourses.Where(c=> c.ID == this.CourseId).FirstOrDefault();
         }
+        #endregion
 
         #region Props
 
@@ -64,7 +67,8 @@ namespace DigitalTrainingAssistant.Models
 
         public async Task SaveChanges(GraphServiceClient graphClient, string siteId)
         {
-            var attendenceList = await Utils.GetList(siteId, ModelConstants.ListNameCourseAttendance, graphClient);
+            var spCache = new SPCache(siteId, graphClient);
+            var attendenceList = await spCache.GetList(ModelConstants.ListNameCourseAttendance);
 
             ListItem taskItem = null;
             try
@@ -79,7 +83,7 @@ namespace DigitalTrainingAssistant.Models
             }
             catch (ServiceException ex)
             {
-                if (ex.IsNotFoundError())
+                if (ex.IsItemNotFoundError())
                 {
                     throw new ArgumentOutOfRangeException(nameof(this.ID), $"No attendence record with ID {ID} found");
                 }
@@ -114,16 +118,24 @@ namespace DigitalTrainingAssistant.Models
 
         public static async Task<CourseAttendance> LoadById(GraphServiceClient graphClient, string siteId, int sPID)
         {
-            var courseAttendanceList = await Utils.GetList(siteId, ModelConstants.ListNameCourseAttendance, graphClient);
+            var spCache = new SPCache(siteId, graphClient);
+
+            var courseAttendanceList = await spCache.GetList(ModelConstants.ListNameCourseAttendance);
             var courseAttendanceItem = await graphClient.Sites[siteId].Lists[courseAttendanceList.Id].Items[sPID.ToString()].Request().Expand("fields").GetAsync();
             var allUsers = await CoursesMetadata.LoadSiteUsers(graphClient, siteId);
 
             var attendance = new CourseAttendance(courseAttendanceItem, allUsers);
+
             var course = await Course.LoadById(graphClient, siteId, attendance.CourseId);
 
             attendance.ParentCourse = course;
 
             return attendance;
+        }
+
+        public override string ToString()
+        {
+            return $"{this.User}";
         }
     }
 }

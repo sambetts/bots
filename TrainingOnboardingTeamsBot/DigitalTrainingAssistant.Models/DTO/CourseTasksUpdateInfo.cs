@@ -11,6 +11,8 @@ namespace DigitalTrainingAssistant.Models
 {
     public class CourseTasksUpdateInfo
     {
+        #region Constructors
+
         public CourseTasksUpdateInfo() { }
         public CourseTasksUpdateInfo(string json, string userAadObjectId) 
         {
@@ -33,9 +35,9 @@ namespace DigitalTrainingAssistant.Models
                     }
                 }
             }
-
             
         }
+        #endregion
 
         public async Task SendReply(ITurnContext turnContext, CancellationToken cancellationToken, string appId, string appPassword, string siteId)
         {
@@ -60,11 +62,15 @@ namespace DigitalTrainingAssistant.Models
             }
         }
 
+        #region Props
+
         public bool HasChanges => this.ConfirmedTaskIds.Count > 0;
 
         public List<int> ConfirmedTaskIds { get; set; } = new List<int>();
 
         public string UserAadObjectId { get; set; }
+
+        #endregion
 
         /// <summary>
         /// Save to SharePoint
@@ -76,12 +82,8 @@ namespace DigitalTrainingAssistant.Models
                 throw new ArgumentNullException(nameof(UserAadObjectId));
             }
 
-            var allLists = await graphClient.Sites[siteId]
-                    .Lists
-                    .Request()
-                    .GetAsync();
+            var spCache = new SPCache(siteId, graphClient);
 
-            var checklistConfirmationsList = allLists.Where(l => l.Name == ModelConstants.ListNameChecklistConfirmations).SingleOrDefault();
             var hiddenUserListId = (await graphClient
                 .Sites[siteId]
                 .Lists
@@ -89,8 +91,9 @@ namespace DigitalTrainingAssistant.Models
                 .Filter($"displayName eq '{ModelConstants.ListNameUserInformationList}'")
                 .GetAsync())[0].Id;
 
-            // Doesn't work: var hiddenUserListId = allLists.Where(l => l.DisplayName == ModelConstants.ListNameUserInformationList).SingleOrDefault().Id;
-            var checkListItemListId = allLists.Where(l => l.DisplayName == ModelConstants.ListNameCourseChecklist).SingleOrDefault().Id;
+
+            var checkListItemList = await spCache.GetList(ModelConstants.ListNameCourseChecklist);
+            var checkListItemListId = checkListItemList.Id;
 
             var user = await graphClient.Users[UserAadObjectId].Request().GetAsync();
             var userLookupId = (await graphClient
@@ -117,7 +120,7 @@ namespace DigitalTrainingAssistant.Models
                 }
                 catch (ServiceException ex)
                 {
-                    if (ex.IsNotFoundError())
+                    if (ex.IsItemNotFoundError())
                     {
                         throw new ArgumentOutOfRangeException(nameof(this.ConfirmedTaskIds), $"No task with ID {taskIdCompleted} found");
                     }
@@ -143,9 +146,12 @@ namespace DigitalTrainingAssistant.Models
                     }
                 };
 
+                var checkListConfirmationList = await spCache.GetList(ModelConstants.ListNameChecklistConfirmations);
+                var checkListConfirmationListId = checkListConfirmationList.Id;
+
                 await graphClient
                     .Sites[siteId]
-                    .Lists["Checklist Confirmations"]
+                    .Lists[checkListConfirmationListId]
                     .Items
                     .Request()
                     .AddAsync(confirmationItem);
