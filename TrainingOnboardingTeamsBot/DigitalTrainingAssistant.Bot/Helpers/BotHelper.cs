@@ -1,13 +1,10 @@
 ﻿using DigitalTrainingAssistant.Bot.Cards;
-using DigitalTrainingAssistant.Bot.Dialogues;
-using DigitalTrainingAssistant.Bot.Models;
 using DigitalTrainingAssistant.Models;
 using Microsoft.Bot.Builder;
-using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
-using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -309,6 +306,10 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                 await graphClient.Users[userid].Teamwork.InstalledApps[installedApp.Id].Chat
                     .Request()
                     .GetAsync();
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(appId), $"Can't find Teams app with id {appId} to trigger a conversation for");
+            }
 
         }
     }

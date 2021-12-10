@@ -46,7 +46,7 @@ namespace DigitalTrainingAssistant.Models
         }
         public PendingUserActions GetActionsByEmail(string email)
         {
-            return new PendingUserActions { Actions = Actions.Where(a => a.Attendee.User.Email.ToLower() == email.ToLower()).ToList() };
+            return new PendingUserActions { Actions = Actions.Where(a => a.Attendee?.User?.Email?.ToLower() == email.ToLower()).ToList() };
         }
         public override string ToString()
         {
