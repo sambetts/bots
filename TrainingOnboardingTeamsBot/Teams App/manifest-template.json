@@ -32,7 +32,7 @@
                 "personal"
               ],
             "isNotificationOnly": false,
-            "supportsFiles": false
+            "supportsFiles": true
         }
     ],
     "permissions": [

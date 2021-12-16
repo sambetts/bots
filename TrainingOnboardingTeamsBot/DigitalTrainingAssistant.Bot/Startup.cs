@@ -55,6 +55,8 @@ namespace Microsoft.BotBuilderSamples
             services.AddSingleton<MainDialog>();
             services.AddSingleton<UpdateProfileDialog>();
 
+            // The Bot needs an HttpClient to download and upload files.
+            services.AddHttpClient();
 
             // Create a global hashset for our ConversationReferences
             services.AddSingleton<BotHelper>();

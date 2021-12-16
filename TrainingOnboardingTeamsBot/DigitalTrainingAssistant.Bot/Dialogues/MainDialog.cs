@@ -177,7 +177,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
 
 
                     // Send back to user for now
-                    await stepContext.Context.SendActivityAsync(MessageFactory.Text("Saved. Now let's introduce you to the Team..."));
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text("Saved your info."));
 
                     return null;
                 }
