@@ -23,6 +23,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Cards\Templates\DefaultCourseImageBase64.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Cards\Templates\DefaultCourseImageBase64.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Cards\Templates\AttendeeFixedQuestionsInput.json" />
     <EmbeddedResource Include="Cards\Templates\AttendeeFixedQuestionsPublication.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

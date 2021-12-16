@@ -62,8 +62,9 @@
   "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
   "actions": [
     {
-      "type": "Action.Submit",
-      "title": "Chat with me"
+      "type": "Action.OpenUrl",
+      "title": "Chat with me",
+      "url": "https://teams.microsoft.com/l/chat/0/0?users={AttendeeEmail}"
     }
   ]
 }

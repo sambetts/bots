@@ -12,10 +12,13 @@ namespace DigitalTrainingAssistant.Bot.Cards
     {
         public static string FIELD_NAME_BOT_NAME => "${BotName}";
         public static string FIELD_NAME_TRAINER_NAME => "${TrainerName}";
+        public static string FIELD_NAME_TRAINER_EMAIL => "${TrainerEmai}";
         public static string FIELD_NAME_ATTENDEE_NAME => "${AttendeeName}";
         public static string FIELD_NAME_ATTENDEE_EMAIL => "${AttendeeEmail}";
         public static string FIELD_NAME_COURSE_NAME => "${CourseName}";
+        public static string FIELD_NAME_COURSE_IMAGE_BASE64 => "${CourseImageBase64}";
         public static string FIELD_NAME_COURSE_INTRO_TEXT => "${CourseIntroduction}";
+        public static string FIELD_NAME_COURSE_LINK => "${CourseLink}";
 
         public static string FIELD_NAME_SHAREPOINT_ID => "${SharePointId}";
 
@@ -32,6 +35,7 @@ namespace DigitalTrainingAssistant.Bot.Cards
         public static string CardFileNameCourseWelcome => "DigitalTrainingAssistant.Bot.Cards.Templates.CourseWelcome.json";
         public static string CardFileNameIntroduceYourself => "DigitalTrainingAssistant.Bot.Cards.Templates.IntroduceYourself.json";
         public static string CardFileNameLearnerQuestions => "DigitalTrainingAssistant.Bot.Cards.Templates.LearnerQuestions.json";
+        public static string CourseDefaultImage => "DigitalTrainingAssistant.Bot.Cards.Templates.DefaultCourseImageBase64.txt";
 
 
         public const string CardActionPropName = "action";

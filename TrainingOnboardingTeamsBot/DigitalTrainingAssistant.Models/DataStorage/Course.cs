@@ -18,6 +18,8 @@ namespace DigitalTrainingAssistant.Models
             this.WelcomeMessage = base.GetFieldValue(courseItem, "WelcomeMessage");
             this.TeamId = base.GetFieldValue(courseItem, "TeamID");
             this.TeamChannelId = base.GetFieldValue(courseItem, "ChannelID");
+            this.Link = base.GetFieldValue(courseItem, "LearnerAppLink");
+            this.ImageBase64Data = base.GetFieldValue(courseItem, "ImageBase64");
 
             var daysBeforeToSendRemindersString = base.GetFieldValue(courseItem, "DaysBeforeToSendReminders");
             var days = 3;       // Default 3 days
@@ -46,6 +48,8 @@ namespace DigitalTrainingAssistant.Models
         public List<CourseAttendance> Attendees { get; set; } = new List<CourseAttendance>();
         public int DaysBeforeToSendReminders { get; set; }
 
+        public string ImageBase64Data { get; set; }
+        public string Link { get; set; }
         public string TeamId { get; set; }
         public string TeamChannelId { get; set; }
         public bool HasValidTeamsSettings => !string.IsNullOrEmpty(TeamId) && !string.IsNullOrEmpty(TeamChannelId);
