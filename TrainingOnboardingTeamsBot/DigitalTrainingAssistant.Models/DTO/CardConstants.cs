@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DigitalTrainingAssistant.Bot.Cards
+namespace DigitalTrainingAssistant.Models
 {
     /// <summary>
     /// A class that holds card constants that are used in multiple files.

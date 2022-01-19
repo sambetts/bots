@@ -18,4 +18,10 @@ namespace DigitalTrainingAssistant.Models
     {
         public GraphAccessException(string msg) : base(msg) { }
     }
+
+    public class BotConfigException : BotException
+    {
+        public BotConfigException(string msg) : base(msg) { }
+
+    }
 }

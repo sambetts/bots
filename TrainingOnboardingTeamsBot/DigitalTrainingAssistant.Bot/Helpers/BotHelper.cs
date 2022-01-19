@@ -154,7 +154,6 @@ namespace DigitalTrainingAssistant.Bot.Helpers
             // Load all course data from lists
             var allTrainingData = await CoursesMetadata.LoadTrainingSPData(graphClient, Config.SharePointSiteId);
 
-
             var coursesThisUserIsLeading = allTrainingData.Courses.Where(c => c.Trainer?.Email?.ToLower() == trainerEmail.ToLower()).ToList();
 
             var pendingTrainingActionsForCoursesThisUserIsTeaching = allTrainingData.GetUserActionsWithThingsToDo(coursesThisUserIsLeading, filterByCourseReminderDays);
@@ -219,6 +218,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                     {
                         throw new GraphAccessException("I don't seem to have permissions to install my Teams App for trainees so I can proactively remind them (TeamsAppInstallation.ReadWriteForUser.All)");
                     }
+
                     throw;
                 }
 
@@ -254,6 +254,10 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                 if (ex.Error.Code == "Conflict")
                 {
                     await TriggerUserConversationUpdate(userid, tenantId, appId, appPassword);
+                }
+                else if (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    throw new BotConfigException($"Teams app ID '{Config.AppCatalogTeamAppId}' doesn't seem to exist");
                 }
                 else throw;
             }

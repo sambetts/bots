@@ -1,7 +1,6 @@
-﻿using DigitalTrainingAssistant.Bot.Cards;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace DigitalTrainingAssistant.Bot.Models
+namespace DigitalTrainingAssistant.Models
 {
     /// <summary>
     /// Json response from an adaptive card submit
@@ -12,7 +11,7 @@ namespace DigitalTrainingAssistant.Bot.Models
         public string Action { get; set; }
     }
 
-    public class ActionResponseForSharePointItem
+    public class ActionResponseForSharePointItem : ActionResponse
     {
         [JsonProperty(CardConstants.CardSharePointIdPropName)]
         public int SPID { get; set; }
