@@ -15,10 +15,10 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
     /// </summary>
     public class MainDialog : CancelAndHelpDialog
     {
-        private BotHelper _botHelper;
+        private BotActionsHelper _botHelper;
         private BotConfig _configuration;
         private BotConversationCache _botConversationCache;
-        public MainDialog(UpdateProfileDialog updateProfileDialog, BotHelper botHelper, BotConfig configuration, BotConversationCache botConversationCache) : base(nameof(MainDialog))
+        public MainDialog(UpdateProfileDialog updateProfileDialog, BotActionsHelper botHelper, BotConfig configuration, BotConversationCache botConversationCache) : base(nameof(MainDialog))
         {
             _botHelper = botHelper;
             _configuration = configuration;

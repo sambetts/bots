@@ -57,7 +57,8 @@ namespace Microsoft.BotBuilderSamples
 
 
             // Create a global hashset for our ConversationReferences
-            services.AddSingleton<BotHelper>();
+            services.AddSingleton<BotActionsHelper>();
+            services.AddSingleton<BotAppInstallHelper>();
 
             services.AddSingleton<BotConversationCache>();
 

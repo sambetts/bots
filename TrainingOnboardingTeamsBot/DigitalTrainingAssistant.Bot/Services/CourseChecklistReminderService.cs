@@ -11,11 +11,11 @@ namespace DigitalTrainingAssistant.Bot.Services
 {
     public class CourseChecklistReminderService : BackgroundService
     {
-        private readonly BotHelper _helper;
+        private readonly BotActionsHelper _helper;
         private readonly IBotFrameworkHttpAdapter _adapter;
         public BotConfig Config { get; set; }
 
-        public CourseChecklistReminderService(BotHelper helper, BotConfig config, IBotFrameworkHttpAdapter adapter)
+        public CourseChecklistReminderService(BotActionsHelper helper, BotConfig config, IBotFrameworkHttpAdapter adapter)
         {
             _helper = helper;
             _adapter = adapter;

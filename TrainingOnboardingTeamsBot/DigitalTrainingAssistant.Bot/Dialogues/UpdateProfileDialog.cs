@@ -23,8 +23,8 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
         protected readonly ILogger Logger;
 
         private BotConfig _botConfig;
-        private BotHelper _botHelper;
-        public UpdateProfileDialog(BotHelper botHelper, BotConfig botConfig, ILogger<UpdateProfileDialog> logger)
+        private BotActionsHelper _botHelper;
+        public UpdateProfileDialog(BotActionsHelper botHelper, BotConfig botConfig, ILogger<UpdateProfileDialog> logger)
             : base(nameof(UpdateProfileDialog), botConfig.BotOAuthConnectionName)
         {
             Logger = logger;

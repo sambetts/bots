@@ -15,10 +15,10 @@ namespace DigitalTrainingAssistant.Bot
     public class DigitalTrainingAssistantBot<T> : DialogBot<T> where T : Dialog
     {
         public readonly BotConfig _configuration;
-        private readonly BotHelper _helper;
+        private readonly BotActionsHelper _helper;
         BotConversationCache _conversationCache = null;
 
-        public DigitalTrainingAssistantBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger, BotHelper helper, BotConfig configuration, BotConversationCache botConversationCache)
+        public DigitalTrainingAssistantBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger, BotActionsHelper helper, BotConfig configuration, BotConversationCache botConversationCache)
             : base(conversationState, userState, dialog, logger)
         {
             _helper = helper;
@@ -39,7 +39,7 @@ namespace DigitalTrainingAssistant.Bot
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
                     // Add current user to conversation reference.
-                    await _helper.AddConversationReference(turnContext.Activity as Activity);
+                    await _helper.AddConversationReferenceToCache(turnContext.Activity as Activity);
 
                     // Now figure out if user needs to do something
                     var user = _conversationCache.GetCachedUser(turnContext.Activity.GetConversationReference().User.AadObjectId);
