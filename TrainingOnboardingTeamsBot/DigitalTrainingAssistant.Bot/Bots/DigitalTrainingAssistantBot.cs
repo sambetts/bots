@@ -48,7 +48,7 @@ namespace DigitalTrainingAssistant.Bot
                     // Send bot intro if they're on a course
                     if (pendingTrainingActions.Actions.Count > 0)
                     {
-                        var introCardAttachment = new BotWelcomeCard(BotConstants.BotName).GetCard();
+                        var introCardAttachment = new BotWelcomeCard(BotConstants.BotName).GetCardAttachment();
                         await turnContext.SendActivityAsync(MessageFactory.Attachment(introCardAttachment));
 
                         // Send outstanding tasks

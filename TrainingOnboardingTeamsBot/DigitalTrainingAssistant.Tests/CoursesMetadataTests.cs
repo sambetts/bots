@@ -1,7 +1,5 @@
 using DigitalTrainingAssistant.Models;
 using DigitalTrainingAssistant.UnitTests;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Graph;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -10,28 +8,8 @@ using System.Threading.Tasks;
 namespace DigitalTrainingAssistant.Tests
 {
     [TestClass]
-    public class CoursesMetadataTests
+    public class CoursesMetadataTests : BaseUnitTest
     {
-        #region Stuff
-
-        private TestConfig _configuration;
-
-        [TestInitialize]
-        public void Init()
-        {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(System.AppDomain.CurrentDomain.BaseDirectory)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-
-            _configuration = new TestConfig(builder.Build());
-        }
-        async Task<GraphServiceClient> GetClient()
-        {
-            var token = await AuthHelper.GetToken(_configuration.TenantId, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword);
-            return AuthHelper.GetAuthenticatedClient(token);
-        }
-        #endregion
-
         /// <summary>
         /// Tests that DaysBeforeToSendReminders is taken into 
         /// </summary>
@@ -82,7 +60,7 @@ namespace DigitalTrainingAssistant.Tests
         [TestMethod]
         public async Task CoursesMetadataLoadTrainingSPData()
         {
-            var graphClient = await GetClient();
+            var graphClient = await TestingUtils.GetClient(_configuration);
             var meta = await CoursesMetadata.LoadTrainingSPData(graphClient, _configuration.SharePointSiteId);
             Assert.IsNotNull(meta);
 
@@ -94,7 +72,7 @@ namespace DigitalTrainingAssistant.Tests
         [TestMethod]
         public async Task CourseAttendanceLoadById()
         {
-            var graphClient = await GetClient();
+            var graphClient = await TestingUtils.GetClient(_configuration);
             var attendance = await CourseAttendance.LoadById(graphClient, _configuration.SharePointSiteId, 1);
             Assert.IsNotNull(attendance);
 
@@ -107,7 +85,7 @@ namespace DigitalTrainingAssistant.Tests
         [TestMethod]
         public async Task CourseTasksUpdateInfoSave()
         {
-            var graphClient = await GetClient();
+            var graphClient = await TestingUtils.GetClient(_configuration);
 
             var testInvalidUpdate = new CourseTasksUpdateInfo { UserAadObjectId = _configuration.TestUserAadObjectId };
             testInvalidUpdate.ConfirmedTaskIds.Add(233331);
@@ -135,7 +113,7 @@ namespace DigitalTrainingAssistant.Tests
         [TestMethod]
         public async Task CourseAttendanceSave()
         {
-            var graphClient = await GetClient();
+            var graphClient = await TestingUtils.GetClient(_configuration);
 
             var a = new CourseAttendance
             {

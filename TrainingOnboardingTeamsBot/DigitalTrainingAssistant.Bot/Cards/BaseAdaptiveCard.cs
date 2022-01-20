@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace DigitalTrainingAssistant.Bot.Cards
 {
+    /// <summary>
+    /// Base implementation for any of the adaptive cards sent
+    /// </summary>
     public abstract class BaseAdaptiveCard
     {
 
@@ -43,7 +46,7 @@ namespace DigitalTrainingAssistant.Bot.Cards
                     throw new ArgumentOutOfRangeException(nameof(resourcePath), $"No resource found by name '{resourcePath}'");
                 }
         }
-        public Attachment GetCard()
+        public Attachment GetCardAttachment()
         {
             dynamic cardJson = JsonConvert.DeserializeObject(this.GetCardContent());
 

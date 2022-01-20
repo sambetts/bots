@@ -28,6 +28,7 @@ namespace DigitalTrainingAssistant.Models
         public static string FIELD_NAME_QACountry => "${QACountry}";
         public static string FIELD_NAME_QASpareTimeActivities => "${QASpareTimeActivities}";
         public static string FIELD_NAME_QAMobilePhoneNumber => "${QAMobilePhoneNumber}";
+        public static string FIELD_NAME_PROFILE_IMG => "${ProfileImg}";
 
         public static string CardFileNameAttendeeFixedQuestionsInput => "DigitalTrainingAssistant.Bot.Cards.Templates.AttendeeFixedQuestionsInput.json";
         public static string CardFileNameAttendeeFixedQuestionsPublication => "DigitalTrainingAssistant.Bot.Cards.Templates.AttendeeFixedQuestionsPublication.json";

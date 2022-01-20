@@ -76,7 +76,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                 {
                     if (!userAttendeeInfoForCourse.BotContacted && course.HasValidTeamsSettings)
                     {
-                        await turnContext.SendActivityAsync(MessageFactory.Attachment(new CourseWelcomeCard(BotConstants.BotName, course).GetCard()), cancellationToken);
+                        await turnContext.SendActivityAsync(MessageFactory.Attachment(new CourseWelcomeCard(BotConstants.BotName, course).GetCardAttachment()), cancellationToken);
 
                         // Don't send course intro twice to same user
                         userAttendeeInfoForCourse.BotContacted = true;
@@ -85,7 +85,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
 
                     // Send outstanding course actions
                     var actionsForCourse = userPendingActionsForCourse.Actions.Where(a => a.Course == course);
-                    var coursePendingItemsAttachment = new PendingTasksListCard(userAttendeeInfoForCourse, actionsForCourse, course).GetCard();
+                    var coursePendingItemsAttachment = new PendingTasksListCard(userAttendeeInfoForCourse, actionsForCourse, course).GetCardAttachment();
 
                     await turnContext.SendActivityAsync(MessageFactory.Attachment(coursePendingItemsAttachment), cancellationToken);
                 }

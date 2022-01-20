@@ -61,7 +61,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
             {
                 Prompt = new Activity
                 {
-                    Attachments = new List<Attachment>() { new AttendeeFixedQuestionsInputCard(courseAttendance).GetCard() },
+                    Attachments = new List<Attachment>() { new AttendeeFixedQuestionsInputCard(courseAttendance).GetCardAttachment() },
                     Type = ActivityTypes.Message,
                     Text = "Please fill out all the fields below", 
                 }
@@ -95,11 +95,20 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
             }
 
             // Send intro preview
+
+            // DUP CLIENT
+            var token = await AuthHelper.GetToken(stepContext.Context.Activity.Conversation.TenantId, _botConfig.MicrosoftAppId, 
+                _botConfig.MicrosoftAppPassword);
+            var graphClient = AuthHelper.GetAuthenticatedClient(token);
+
+            var previewCard = new AttendeeFixedQuestionsPublicationCard(courseAttendance);
+            await previewCard.LoadProfileImage(graphClient, stepContext.Context.Activity.From.AadObjectId);
+
             await stepContext.Context.SendActivityAsync(MessageFactory.Attachment(
-                        new AttendeeFixedQuestionsPublicationCard(courseAttendance).GetCard()
+                        previewCard.GetCardAttachment()
                         ), cancellationToken);
 
-            // Check if user is OK
+            // Check if user is OK with preview
             return await stepContext.PromptAsync(
                     nameof(ChoicePrompt),
                     new PromptOptions
@@ -138,7 +147,17 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
                 if (courseAttendance.ParentCourse.HasValidTeamsSettings)
                 {
                     var credentials = new MicrosoftAppCredentials(_botConfig.MicrosoftAppId, _botConfig.MicrosoftAppPassword);
-                    var message = MessageFactory.Attachment(new AttendeeFixedQuestionsPublicationCard(courseAttendance).GetCard());
+
+
+                    // DUP CLIENT
+                    var token = await AuthHelper.GetToken(stepContext.Context.Activity.Conversation.TenantId, _botConfig.MicrosoftAppId,
+                        _botConfig.MicrosoftAppPassword);
+                    var graphClient = AuthHelper.GetAuthenticatedClient(token);
+
+                    var previewCard = new AttendeeFixedQuestionsPublicationCard(courseAttendance);
+                    await previewCard.LoadProfileImage(graphClient, stepContext.Context.Activity.From.AadObjectId);
+
+                    var message = MessageFactory.Attachment(previewCard.GetCardAttachment());
 
                     var conversationParameters = new ConversationParameters
                     {
@@ -213,7 +232,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
             if (courseAttendance.ParentCourse.HasValidTeamsSettings)
             {
                 var credentials = new MicrosoftAppCredentials(_botConfig.MicrosoftAppId, _botConfig.MicrosoftAppPassword);
-                var message = MessageFactory.Attachment(new AttendeeFixedQuestionsPublicationCard(courseAttendance).GetCard());
+                var message = MessageFactory.Attachment(new AttendeeFixedQuestionsPublicationCard(courseAttendance).GetCardAttachment());
 
                 var conversationParameters = new ConversationParameters
                 {

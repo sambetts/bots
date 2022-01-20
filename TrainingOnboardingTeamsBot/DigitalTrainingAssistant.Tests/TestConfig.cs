@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DigitalTrainingAssistant.UnitTests
 {
-    internal class TestConfig : BotConfig
+    public class TestConfig : BotConfig
     {
         public TestConfig(IConfiguration configuration) : base(configuration)
         {
