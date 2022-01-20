@@ -105,7 +105,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
                     new PromptOptions
                     {
                         Prompt = stepContext.Context.Activity.CreateReply("Saved your responses. " +
-                            "How about we introduce you like this card above to the team?"),
+                            "How about we introduce you like this card above to the others in the course?"),
                         Choices = new[] { new Choice { Value = "Send" }, new Choice { Value = "Refresh" }, new Choice { Value = "Don't Send" } }.ToList(),
                         RetryPrompt = stepContext.Context.Activity.CreateReply("Sorry, I did not understand that. Please choose/click on any one of the options displayed in below list to proceed"),
                     });

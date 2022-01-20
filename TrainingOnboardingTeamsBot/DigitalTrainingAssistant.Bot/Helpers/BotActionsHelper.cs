@@ -39,17 +39,6 @@ namespace DigitalTrainingAssistant.Bot.Helpers
         #endregion
 
 
-        /// <summary>
-        /// App installed for user & now we have a conversation reference to cache for future chat threads.
-        /// </summary>
-        public async Task AddConversationReferenceToCache(Activity activity)
-        {
-            var token = await AuthHelper.GetToken(activity.Conversation.TenantId, Config.MicrosoftAppId, Config.MicrosoftAppPassword);
-            var graphClient = AuthHelper.GetAuthenticatedClient(token);
-
-            var conversationReference = activity.GetConversationReference();
-            await _conversationCache.AddOrUpdateUserAndConversationId(conversationReference, activity.ServiceUrl, graphClient);
-        }
 
         /// <summary>
         /// Main logic for sending notifications to trainees

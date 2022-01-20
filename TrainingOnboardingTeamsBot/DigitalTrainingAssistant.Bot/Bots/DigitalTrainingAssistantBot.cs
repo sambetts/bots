@@ -39,7 +39,7 @@ namespace DigitalTrainingAssistant.Bot
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
                     // Add current user to conversation reference.
-                    await _helper.AddConversationReferenceToCache(turnContext.Activity as Activity);
+                    await _conversationCache.AddConversationReferenceToCache(turnContext.Activity as Activity);
 
                     // Now figure out if user needs to do something
                     var user = _conversationCache.GetCachedUser(turnContext.Activity.GetConversationReference().User.AadObjectId);
