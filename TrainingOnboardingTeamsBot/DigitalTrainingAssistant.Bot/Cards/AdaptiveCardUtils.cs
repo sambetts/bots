@@ -1,5 +1,6 @@
 ﻿using DigitalTrainingAssistant.Models;
 using Newtonsoft.Json;
+using System;
 
 namespace DigitalTrainingAssistant.Bot.Dialogues
 {
@@ -13,27 +14,31 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
             {
                 r = JsonConvert.DeserializeObject<ActionResponse>(submitJson);
             }
-            catch (JsonException)
+            catch (Exception)
             {
                 // Nothing
             }
 
-            if (r.Action == CardConstants.CardActionValLearnerTasksDone)
+            if (r != null)
             {
-                var update = new CourseTasksUpdateInfo(submitJson, fromAadObjectId);
+                if (r.Action == CardConstants.CardActionValLearnerTasksDone)
+                {
+                    var update = new CourseTasksUpdateInfo(submitJson, fromAadObjectId);
 
-                return update;
+                    return update;
+                }
+                else if (r.Action == CardConstants.CardActionValStartIntroduction)
+                {
+                    var spAction = JsonConvert.DeserializeObject<ActionResponseForSharePointItem>(submitJson);
+                    return spAction;
+                }
+                else if (r.Action == CardConstants.CardActionValSaveIntroductionQuestions)
+                {
+                    var introductionData = JsonConvert.DeserializeObject<IntroduceYourselfResponse>(submitJson);
+                    return introductionData;
+                }
             }
-            else if (r.Action == CardConstants.CardActionValStartIntroduction)
-            {
-                var spAction = JsonConvert.DeserializeObject<ActionResponseForSharePointItem>(submitJson);
-                return spAction;
-            }
-            else if (r.Action == CardConstants.CardActionValSaveIntroductionQuestions)
-            {
-                var introductionData = JsonConvert.DeserializeObject<IntroduceYourselfResponse>(submitJson);
-                return introductionData;
-            }
+            
 
 
             return null;
