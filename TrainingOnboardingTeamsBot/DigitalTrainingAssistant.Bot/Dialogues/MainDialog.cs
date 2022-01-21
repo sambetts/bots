@@ -126,7 +126,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
             {
                 var update = (CourseTasksUpdateInfo)action;
                 await update.SendReply(stepContext.Context, cancellationToken, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword, _configuration.SharePointSiteId);
-
+                return await stepContext.EndDialogAsync(null);
             }
             else if (action is ActionResponseForSharePointItem)
             {
