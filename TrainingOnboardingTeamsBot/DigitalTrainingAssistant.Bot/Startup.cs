@@ -12,6 +12,8 @@ using DigitalTrainingAssistant.Bot;
 using DigitalTrainingAssistant.Bot.Dialogues;
 using DigitalTrainingAssistant.Bot.Services;
 using DigitalTrainingAssistant.Bot.Helpers;
+using Microsoft.Bot.Connector.Authentication;
+using DigitalTrainingAssistant.Models;
 
 namespace Microsoft.BotBuilderSamples
 {
@@ -37,6 +39,8 @@ namespace Microsoft.BotBuilderSamples
             // Create the Bot Framework Adapter with error handling enabled.
             services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
 
+            // Create the Bot Framework Authentication to be used with the Bot Adapter.
+            services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFrameworkAuthentication>();
 
             // Create the storage we'll be using for User and Conversation state. (Memory is great for testing purposes.)
             services.AddSingleton<IStorage, MemoryStorage>();
@@ -53,7 +57,8 @@ namespace Microsoft.BotBuilderSamples
 
 
             // Create a global hashset for our ConversationReferences
-            services.AddSingleton<BotHelper>();
+            services.AddSingleton<BotActionsHelper>();
+            services.AddSingleton<BotAppInstallHelper>();
 
             services.AddSingleton<BotConversationCache>();
 

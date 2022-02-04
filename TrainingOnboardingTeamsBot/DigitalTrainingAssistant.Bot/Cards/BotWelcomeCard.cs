@@ -1,9 +1,4 @@
-﻿using AdaptiveCards;
-using Microsoft.Bot.Schema;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using DigitalTrainingAssistant.Models;
 
 namespace DigitalTrainingAssistant.Bot.Cards
 {
@@ -19,7 +14,7 @@ namespace DigitalTrainingAssistant.Bot.Cards
         
         public override string GetCardContent()
         {
-            var json = Properties.Resources.BotIntroduction;
+            var json = ReadResource(CardConstants.CardFileNameBotIntroduction);
 
             json = base.ReplaceVal(json, CardConstants.FIELD_NAME_BOT_NAME, this.BotName);
 

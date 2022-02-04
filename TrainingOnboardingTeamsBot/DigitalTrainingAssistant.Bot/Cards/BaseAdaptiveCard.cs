@@ -3,11 +3,16 @@ using Microsoft.Bot.Schema;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace DigitalTrainingAssistant.Bot.Cards
 {
+    /// <summary>
+    /// Base implementation for any of the adaptive cards sent
+    /// </summary>
     public abstract class BaseAdaptiveCard
     {
 
@@ -20,7 +25,28 @@ namespace DigitalTrainingAssistant.Bot.Cards
             return json;
         }
 
-        public Attachment GetCard()
+        protected string ReadResource(string resourcePath)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+
+            // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
+            var manifests = assembly.GetManifestResourceNames();
+
+
+            using (var stream = assembly.GetManifestResourceStream(resourcePath))
+                if (stream != null)
+                {
+                    using (var reader = new StreamReader(stream))
+                    {
+                        return reader.ReadToEnd();
+                    }
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException(nameof(resourcePath), $"No resource found by name '{resourcePath}'");
+                }
+        }
+        public Attachment GetCardAttachment()
         {
             dynamic cardJson = JsonConvert.DeserializeObject(this.GetCardContent());
 

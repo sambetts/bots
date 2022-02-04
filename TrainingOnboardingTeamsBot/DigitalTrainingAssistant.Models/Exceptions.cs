@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DigitalTrainingAssistant.Bot
+namespace DigitalTrainingAssistant.Models
 {
     public abstract class BotException : Exception
     {
@@ -17,5 +17,11 @@ namespace DigitalTrainingAssistant.Bot
     public class GraphAccessException : BotException
     {
         public GraphAccessException(string msg) : base(msg) { }
+    }
+
+    public class BotConfigException : BotException
+    {
+        public BotConfigException(string msg) : base(msg) { }
+
     }
 }

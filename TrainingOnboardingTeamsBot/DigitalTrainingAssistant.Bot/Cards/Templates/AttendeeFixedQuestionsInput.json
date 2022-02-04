@@ -71,11 +71,6 @@
       "id": "txtQAMobilePhoneNumber"
     },
     {
-      "type": "TextBlock",
-      "text": "Attach a picture of you:",
-      "wrap": true
-    },
-    {
       "type": "ImageSet",
       "images": [
         {

@@ -19,12 +19,17 @@ namespace DigitalTrainingAssistant.Bot.Cards
 
         public override string GetCardContent()
         {
-            var json = Properties.Resources.CourseWelcome;
+            var json = ReadResource(CardConstants.CardFileNameCourseWelcome);
+            var defaultImageString = ReadResource(CardConstants.CourseDefaultImage);
 
             json = base.ReplaceVal(json, CardConstants.FIELD_NAME_COURSE_NAME, this.Course.Name);
             json = base.ReplaceVal(json, CardConstants.FIELD_NAME_BOT_NAME, this.BotName);
-            json = base.ReplaceVal(json, CardConstants.FIELD_NAME_TRAINER_NAME, Course.Trainer.Name);
-            json = base.ReplaceVal(json, CardConstants.FIELD_NAME_COURSE_INTRO_TEXT, Course.WelcomeMessage);
+            json = base.ReplaceVal(json, CardConstants.FIELD_NAME_TRAINER_NAME, Course?.Trainer?.Name);
+            json = base.ReplaceVal(json, CardConstants.FIELD_NAME_TRAINER_EMAIL, Course?.Trainer?.Email);
+            json = base.ReplaceVal(json, CardConstants.FIELD_NAME_COURSE_INTRO_TEXT, Course?.WelcomeMessage);
+            json = base.ReplaceVal(json, CardConstants.FIELD_NAME_COURSE_LINK, Course?.Link);
+            json = base.ReplaceVal(json, CardConstants.FIELD_NAME_COURSE_IMAGE_BASE64, 
+                !string.IsNullOrEmpty(Course?.ImageBase64Data) ? Course?.ImageBase64Data : defaultImageString);
 
             return json;
         }

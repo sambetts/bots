@@ -11,52 +11,60 @@
           "items": [
             {
               "type": "TextBlock",
-              "text": "Adele Vance has joined the learning group",
+              "text": "${AttendeeName} has joined the learning group",
               "wrap": true
             }
           ],
-          "spacing": "none"
+          "spacing": "None"
         }
       ]
     },
     {
       "type": "TextBlock",
-      "text": "Hi, my name is Adele Vance (AdeleV@M365x352268.OnMicrosoft.com)",
+      "text": "Hi, my name is ${AttendeeName} (${AttendeeEmail})",
       "size": "Medium",
       "weight": "Bolder",
       "wrap": true
     },
     {
+      "type": "Image",
+      "altText": "Image",
+      "horizontalAlignment": "Center",
+      "url": "${ProfileImg}",
+      "style": "Person"
+    },
+    {
       "type": "TextBlock",
-      "text": "I work in organization (BA & Division): ",
+      "text": "I work in organization (BA & Division): ${QAOrg}",
       "wrap": true
     },
     {
       "type": "TextBlock",
-      "text": "My role: sdfgsdfg",
+      "text": "My role: ${QARole}",
       "wrap": true
     },
     {
       "type": "TextBlock",
-      "text": "Country where I live in: sdfgfsdfg",
+      "text": "Country where I live in: ${QACountry}",
       "wrap": true
     },
     {
       "type": "TextBlock",
-      "text": "In my spare-time I like to: sdfgsdfgf",
+      "text": "In my spare-time I like to: ${QASpareTimeActivities}",
       "wrap": true
     },
     {
       "type": "TextBlock",
-      "text": "My phone number: ",
+      "text": "My phone number: ${QAMobilePhoneNumber}",
       "wrap": true
     }
   ],
   "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
   "actions": [
     {
-      "type": "Action.Submit",
-      "title": "Chat with me"
+      "type": "Action.OpenUrl",
+      "title": "Chat with me",
+      "url": "https://teams.microsoft.com/l/chat/0/0?users={AttendeeEmail}"
     }
   ]
 }

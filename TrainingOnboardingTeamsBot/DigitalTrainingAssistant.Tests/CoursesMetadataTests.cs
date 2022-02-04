@@ -1,6 +1,5 @@
 using DigitalTrainingAssistant.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Graph;
+using DigitalTrainingAssistant.UnitTests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -9,28 +8,8 @@ using System.Threading.Tasks;
 namespace DigitalTrainingAssistant.Tests
 {
     [TestClass]
-    public class CoursesMetadataTests
+    public class CoursesMetadataTests : BaseUnitTest
     {
-        #region Stuff
-
-        public IConfiguration _configuration;
-
-        [TestInitialize]
-        public void Init()
-        {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(System.AppDomain.CurrentDomain.BaseDirectory)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-
-            _configuration = builder.Build();
-        }
-        async Task<GraphServiceClient> GetClient()
-        {
-            var token = await AuthHelper.GetToken(_configuration["TenantId"], _configuration["MicrosoftAppId"], _configuration["MicrosoftAppPassword"]);
-            return AuthHelper.GetAuthenticatedClient(token);
-        }
-        #endregion
-
         /// <summary>
         /// Tests that DaysBeforeToSendReminders is taken into 
         /// </summary>
@@ -81,8 +60,8 @@ namespace DigitalTrainingAssistant.Tests
         [TestMethod]
         public async Task CoursesMetadataLoadTrainingSPData()
         {
-            var graphClient = await GetClient();
-            var meta = await CoursesMetadata.LoadTrainingSPData(graphClient, _configuration["SharePointSiteId"]);
+            var graphClient = await TestingUtils.GetClient(_configuration);
+            var meta = await CoursesMetadata.LoadTrainingSPData(graphClient, _configuration.SharePointSiteId);
             Assert.IsNotNull(meta);
 
             Assert.IsTrue(meta.Courses.Count > 0);
@@ -93,8 +72,8 @@ namespace DigitalTrainingAssistant.Tests
         [TestMethod]
         public async Task CourseAttendanceLoadById()
         {
-            var graphClient = await GetClient();
-            var attendance = await CourseAttendance.LoadById(graphClient, _configuration["SharePointSiteId"], 1);
+            var graphClient = await TestingUtils.GetClient(_configuration);
+            var attendance = await CourseAttendance.LoadById(graphClient, _configuration.SharePointSiteId, 1);
             Assert.IsNotNull(attendance);
 
             Assert.IsTrue(attendance.ParentCourse.ID != 0);
@@ -106,16 +85,26 @@ namespace DigitalTrainingAssistant.Tests
         [TestMethod]
         public async Task CourseTasksUpdateInfoSave()
         {
-            var graphClient = await GetClient();
+            var graphClient = await TestingUtils.GetClient(_configuration);
 
-            var testInvalidUpdate = new CourseTasksUpdateInfo { UserAadObjectId = _configuration["TestUserAadObjectId"] };
+            var testInvalidUpdate = new CourseTasksUpdateInfo { UserAadObjectId = _configuration.TestUserAadObjectId };
             testInvalidUpdate.ConfirmedTaskIds.Add(233331);
-            await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(() => testInvalidUpdate.SaveChanges(graphClient, _configuration["SharePointSiteId"]));
+            await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(() => testInvalidUpdate.SaveChanges(graphClient, _configuration.SharePointSiteId));
 
-            var testUpdate = new CourseTasksUpdateInfo { UserAadObjectId = _configuration["TestUserAadObjectId"] };
-            testUpdate.ConfirmedTaskIds.Add(1);
+            // Phind phirst task
+            var spCache = new SPCache(_configuration.SharePointSiteId, graphClient);
+            var checkListList = await spCache.GetList(ModelConstants.ListNameCourseChecklist);
+            var firstRecordResult = await graphClient.Sites[_configuration.SharePointSiteId].Lists[checkListList.Id].Items.Request()
+                .Top(1)
+                .GetAsync();
+            if (firstRecordResult.Count < 1)
+            {
+                Assert.Fail("No checklist items found in site");
+            }
+            var testUpdate = new CourseTasksUpdateInfo { UserAadObjectId = _configuration.TestUserAadObjectId };
+            testUpdate.ConfirmedTaskIds.Add(int.Parse(firstRecordResult[0].Id));
 
-            await testUpdate.SaveChanges(graphClient, _configuration["SharePointSiteId"]);
+            await testUpdate.SaveChanges(graphClient, _configuration.SharePointSiteId);
         }
 
         /// <summary>
@@ -124,7 +113,7 @@ namespace DigitalTrainingAssistant.Tests
         [TestMethod]
         public async Task CourseAttendanceSave()
         {
-            var graphClient = await GetClient();
+            var graphClient = await TestingUtils.GetClient(_configuration);
 
             var a = new CourseAttendance
             {
@@ -138,7 +127,7 @@ namespace DigitalTrainingAssistant.Tests
                 User = new SiteUser { Email = "AdeleV@M365x352268.OnMicrosoft.com", Name = "Adele" }
             };
 
-            await a.SaveChanges(graphClient, _configuration["SharePointSiteId"]);
+            await a.SaveChanges(graphClient, _configuration.SharePointSiteId);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace DigitalTrainingAssistant.Models
 {
     public static class Utils
     {
-        public static bool IsNotFoundError(this ServiceException ex)
+        public static bool IsItemNotFoundError(this ServiceException ex)
         {
             if (ex is null)
             {
@@ -22,18 +22,6 @@ namespace DigitalTrainingAssistant.Models
             {
                 return false;
             }
-        }
-
-        public static async Task<List> GetList(string siteId, string listName, GraphServiceClient graphClient)
-        {
-            var allLists = await graphClient.Sites[siteId]
-                                .Lists
-                                .Request()
-                                .GetAsync();
-
-            var coursesList = allLists.Where(l => l.Name == ModelConstants.ListNameCourses).SingleOrDefault();
-            return allLists.Where(l => l.Name == listName).SingleOrDefault();
-
         }
     }
 }

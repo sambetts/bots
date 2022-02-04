@@ -15,10 +15,10 @@ namespace DigitalTrainingAssistant.Bot
     public class DigitalTrainingAssistantBot<T> : DialogBot<T> where T : Dialog
     {
         public readonly BotConfig _configuration;
-        private readonly BotHelper _helper;
+        private readonly BotActionsHelper _helper;
         BotConversationCache _conversationCache = null;
 
-        public DigitalTrainingAssistantBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger, BotHelper helper, BotConfig configuration, BotConversationCache botConversationCache)
+        public DigitalTrainingAssistantBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger, BotActionsHelper helper, BotConfig configuration, BotConversationCache botConversationCache)
             : base(conversationState, userState, dialog, logger)
         {
             _helper = helper;
@@ -39,7 +39,7 @@ namespace DigitalTrainingAssistant.Bot
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
                     // Add current user to conversation reference.
-                    await _helper.AddConversationReference(turnContext.Activity as Activity);
+                    await _conversationCache.AddConversationReferenceToCache(turnContext.Activity as Activity);
 
                     // Now figure out if user needs to do something
                     var user = _conversationCache.GetCachedUser(turnContext.Activity.GetConversationReference().User.AadObjectId);
@@ -48,11 +48,18 @@ namespace DigitalTrainingAssistant.Bot
                     // Send bot intro if they're on a course
                     if (pendingTrainingActions.Actions.Count > 0)
                     {
-                        var introCardAttachment = new BotWelcomeCard(BotConstants.BotName).GetCard();
+                        var introCardAttachment = new BotWelcomeCard(BotConstants.BotName).GetCardAttachment();
                         await turnContext.SendActivityAsync(MessageFactory.Attachment(introCardAttachment));
 
                         // Send outstanding tasks
-                        await _helper.SendCourseIntroAndTrainingRemindersToUser(user, turnContext, cancellationToken, pendingTrainingActions, graphClient);
+                        try
+                        {
+                            await _helper.SendCourseIntroAndTrainingRemindersToUser(user, turnContext, cancellationToken, pendingTrainingActions, graphClient);
+                        }
+                        catch (GraphAccessException ex)
+                        {
+                            await turnContext.SendActivityAsync(MessageFactory.Text(ex.Message));
+                        }
                     }
                 }
             }

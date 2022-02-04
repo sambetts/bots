@@ -24,5 +24,10 @@ namespace DigitalTrainingAssistant.Models
 
         public List<string> FinishedBy { get; set; } = new List<string>();
         public List<SiteUser> CompletedUsers { get; set; } = new List<SiteUser>();
+
+        public override string ToString()
+        {
+            return $"{this.Requirement}";
+        }
     }
 }

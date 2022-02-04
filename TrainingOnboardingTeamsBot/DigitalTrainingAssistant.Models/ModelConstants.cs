@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DigitalTrainingAssistant.Models
 {
-    internal class ModelConstants
+    public class ModelConstants
     {
         public const string ListNameCourses = "Courses";
         public const string ListNameCourseAttendance = "Course Attendance";

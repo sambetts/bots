@@ -1,7 +1,4 @@
 ﻿using Microsoft.Graph;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DigitalTrainingAssistant.Models
 {
@@ -17,6 +14,11 @@ namespace DigitalTrainingAssistant.Models
 
         public string Email { get; set; }
         public string Name { get; set; }
+
+        public override string ToString()
+        {
+            return $"{this.Name} ({this.Email})";
+        }
     }
 
 }

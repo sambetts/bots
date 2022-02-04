@@ -69,20 +69,12 @@ namespace DigitalTrainingAssistant.Models
         {
             try
             {
-                var allLists = await graphClient.Sites[siteId]
-                    .Lists
-                    .Request()
-                    .GetAsync();
+                var spCache = new SPCache(siteId, graphClient);
 
-                var coursesList = allLists.Where(l => l.Name == ModelConstants.ListNameCourses).SingleOrDefault();
-                var courseAttendanceList = allLists.Where(l => l.Name == ModelConstants.ListNameCourseAttendance).SingleOrDefault();
-                var coursesChecklistList = allLists.Where(l => l.Name == ModelConstants.ListNameCourseChecklist).SingleOrDefault();
-                var checklistConfirmationsList = allLists.Where(l => l.Name == ModelConstants.ListNameChecklistConfirmations).SingleOrDefault();
-
-                if (coursesList == null || coursesChecklistList == null || coursesChecklistList == null || checklistConfirmationsList == null)
-                {
-                    throw new Exception("Missing lists from SharePoint site");
-                }
+                var coursesList = await spCache.GetList(ModelConstants.ListNameCourses);
+                var courseAttendanceList = await spCache.GetList(ModelConstants.ListNameCourseAttendance);
+                var coursesChecklistList = await spCache.GetList(ModelConstants.ListNameCourseChecklist);
+                var checklistConfirmationsList = await spCache.GetList(ModelConstants.ListNameChecklistConfirmations);
 
                 // Parallel load everything from SP
                 var coursesListTask = graphClient.Sites[siteId].Lists[coursesList.Id].Items.Request().Expand("fields").GetAsync();
@@ -99,7 +91,14 @@ namespace DigitalTrainingAssistant.Models
             }
             catch (ServiceException ex)
             {
-                throw ex;
+                if (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                {
+                    throw new BotSharePointAccessException();
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
 
