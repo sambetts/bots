@@ -27,6 +27,7 @@ namespace DigitalTrainingAssistant.Bot
                 config.Storage,
                 TABLE_NAME);
 
+            // Dev only: make sure the Azure Storage emulator is running or this will fail
             _tableClient.CreateIfNotExists();
 
             var queryResultsFilter = _tableClient.Query<CachedUserAndConversationData>(filter: $"PartitionKey eq '{CachedUserAndConversationData.PartitionKeyVal}'");

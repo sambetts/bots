@@ -1,12 +1,13 @@
 ﻿using AdaptiveCards;
 using DigitalTrainingAssistant.Bot.Models.Card;
 using DigitalTrainingAssistant.Models;
+using System;
 using System.Collections.Generic;
 
 namespace DigitalTrainingAssistant.Bot.Cards
 {
     /// <summary>
-    /// Class that helps to create learning plan list card.
+    /// Class that helps to create learning plan list card. No template Json for this one as it's mainly just dynamic content.
     /// </summary>
     public class PendingTasksListCard : BaseAdaptiveCard
     {
@@ -30,7 +31,7 @@ namespace DigitalTrainingAssistant.Bot.Cards
             var checkBoxes = new List<AdaptiveElement>();
             var labels = new List<AdaptiveElement>();
 
-
+            // Generate actions body
             foreach (var action in ActionsPending)
             {
                 foreach (var item in action.PendingItems)
@@ -51,6 +52,7 @@ namespace DigitalTrainingAssistant.Bot.Cards
                 }
             };
 
+            // Insert actions into card body
             var card = new CardWithButtons()
             {
                 Body = new List<AdaptiveElement>()
@@ -66,17 +68,29 @@ namespace DigitalTrainingAssistant.Bot.Cards
                     {
                         Bleed = true, Items = new List<AdaptiveElement>()
                         {
-                            new AdaptiveTextBlock("Tell me what's done by selecting tasks and clicking the button below") { Size = AdaptiveTextSize.Medium }
+                            new AdaptiveTextBlock("Tell me what's done by selecting tasks and clicking the 'set tasks complete' below:") 
+                            { 
+                                Size = AdaptiveTextSize.Medium,
+                                Wrap = true
+                            }
                         }
                     },
                     cols
                 },
                 Actions = new List<AdaptiveAction>
                 {
-                    new AdaptiveSubmitAction{ Title= "Set Tasks Complete", DataJson="{\"" + CardConstants.CardActionPropName + "\":\"" + CardConstants.CardActionValLearnerTasksDone + "\"}" }
+                    new AdaptiveSubmitAction{ Title= "Set Tasks Complete", 
+                        DataJson="{\"" + CardConstants.CardActionPropName + "\":\"" + CardConstants.CardActionValLearnerTasksDone + "\"}" }
                 }
             };
 
+            // Insert link?
+            if (Uri.IsWellFormedUriString(this.Course.Link, UriKind.Absolute))
+            {
+                card.Actions.Add(new AdaptiveOpenUrlAction { Title = "My Program Activities", Url = new Uri(this.Course.Link) });
+            }
+
+            // Insert "Introduce Yourself"?
             if (!UserAttendeeInfoForCourse.IntroductionDone)
             {
                 card.Body.Insert(1, new AdaptiveContainer

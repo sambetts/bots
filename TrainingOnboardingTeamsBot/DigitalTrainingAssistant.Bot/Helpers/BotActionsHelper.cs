@@ -74,13 +74,15 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                 // Send course intro?
                 if (userAttendeeInfoForCourse != null)
                 {
-                    if (!userAttendeeInfoForCourse.BotContacted && course.HasValidTeamsSettings)
+                    if (!userAttendeeInfoForCourse.BotContacted)
                     {
                         await turnContext.SendActivityAsync(MessageFactory.Attachment(new CourseWelcomeCard(BotConstants.BotName, course).GetCardAttachment()), cancellationToken);
 
                         // Don't send course intro twice to same user
                         userAttendeeInfoForCourse.BotContacted = true;
+#if !DEBUG
                         await userAttendeeInfoForCourse.SaveChanges(graphClient, Config.SharePointSiteId);
+#endif
                     }
 
                     // Send outstanding course actions
@@ -122,7 +124,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                     Conversation = new ConversationAccount() { Id = user.ConversationId },
                 };
 
-                // Ping an update
+                // Ping an update using previous conversation reference (cached conversation ID)
                 await botAdapter.ContinueConversationAsync(Config.MicrosoftAppId, previousConversationReference,
                     async (turnContext, cancellationToken)
                         => await SendCourseIntroAndTrainingRemindersToUser(user, turnContext, cancellationToken, thisUserPendingActions, graphClient)
@@ -140,9 +142,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
 
             // Load all course data from lists
             var allTrainingData = await CoursesMetadata.LoadTrainingSPData(graphClient, Config.SharePointSiteId);
-
             var coursesThisUserIsLeading = allTrainingData.Courses.Where(c => c.Trainer?.Email?.ToLower() == trainerEmail.ToLower()).ToList();
-
             var pendingTrainingActionsForCoursesThisUserIsTeaching = allTrainingData.GetUserActionsWithThingsToDo(coursesThisUserIsLeading, filterByCourseReminderDays);
 
             if (pendingTrainingActionsForCoursesThisUserIsTeaching.Actions.Count > 0)
@@ -171,9 +171,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
             // Install for anyone not cached yet. Will also trigger a reminder for each user
             var cachedConversationEmailAddresses = _conversationCache.GetCachedUsers().Select(u => u.EmailAddress.ToLower());
             var actionsEmailAddresses = pendingTrainingActionsForCoursesThisUserIsTeaching.UniqueUsers.Select(u => u.User.Email.ToLower());
-
             var uncachedEmailAddresses = actionsEmailAddresses.Except(cachedConversationEmailAddresses);
-
             foreach (var userEmailToInstallApp in uncachedEmailAddresses)
             {
                 // Get user from Graph

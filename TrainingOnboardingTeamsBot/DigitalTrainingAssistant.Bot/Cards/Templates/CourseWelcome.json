@@ -39,17 +39,15 @@
           "type": "Action.OpenUrl",
           "title": "My Program Activities",
           "url": "${CourseLink}"
+        },
+        {
+          "type": "Action.OpenUrl",
+          "title": "Contact Coordinator",
+          "url": "https://teams.microsoft.com/l/chat/0/0?users=${TrainerEmai}",
+          "style": "positive"
         }
       ]
     }
   ],
-  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-  "actions": [
-    {
-      "type": "Action.OpenUrl",
-      "title": "Contact Coordinator",
-      "url": "https://teams.microsoft.com/l/chat/0/0?users=${TrainerEmai}",
-      "style": "positive"
-    }
-  ]
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
 }
