@@ -19,7 +19,7 @@ namespace DigitalTrainingAssistant.Models
             this.TeamId = base.GetFieldValue(courseItem, "TeamID");
             this.TeamChannelId = base.GetFieldValue(courseItem, "ChannelID");
             this.Link = base.GetFieldValue(courseItem, "LearnerAppLink");
-            this.ImageBase64Data = base.GetFieldValue(courseItem, "ImageBase64");
+            this.ImageBase64Data = base.GetFieldValue(courseItem, "CourseImgBase64");
 
             var daysBeforeToSendRemindersString = base.GetFieldValue(courseItem, "DaysBeforeToSendReminders");
             var days = 3;       // Default 3 days

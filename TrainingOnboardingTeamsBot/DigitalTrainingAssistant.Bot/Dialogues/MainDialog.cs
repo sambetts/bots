@@ -1,12 +1,9 @@
-﻿using DigitalTrainingAssistant.Bot.Cards;
-using DigitalTrainingAssistant.Bot.Dialogues.Abstract;
+﻿using DigitalTrainingAssistant.Bot.Dialogues.Abstract;
 using DigitalTrainingAssistant.Bot.Helpers;
-using DigitalTrainingAssistant.Bot.Models;
 using DigitalTrainingAssistant.Models;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
-using Newtonsoft.Json;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,10 +15,10 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
     /// </summary>
     public class MainDialog : CancelAndHelpDialog
     {
-        private BotHelper _botHelper;
+        private BotActionsHelper _botHelper;
         private BotConfig _configuration;
         private BotConversationCache _botConversationCache;
-        public MainDialog(UpdateProfileDialog updateProfileDialog, BotHelper botHelper, BotConfig configuration, BotConversationCache botConversationCache) : base(nameof(MainDialog))
+        public MainDialog(UpdateProfileDialog updateProfileDialog, BotActionsHelper botHelper, BotConfig configuration, BotConversationCache botConversationCache) : base(nameof(MainDialog))
         {
             _botHelper = botHelper;
             _configuration = configuration;
@@ -73,7 +70,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
                         ), cancellationToken);
 
                     }
-                    catch (GraphAccessException ex)
+                    catch (BotException ex)
                     {
                         // The exception contains the message for users
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text(ex.Message), cancellationToken);
@@ -122,34 +119,23 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
         public static async Task<DialogTurnResult> HandleCardResponse(WaterfallStepContext stepContext, string submitJson, CancellationToken cancellationToken, BotConfig _configuration)
         {
             // Form action
-            ActionResponse r = null;
-
-            try
-            {
-                r = JsonConvert.DeserializeObject<ActionResponse>(submitJson);
-            }
-            catch (JsonException)
-            {
-                return await ReplyWithNoIdeaAndEndDiag(stepContext, cancellationToken);
-            }
+            var action = AdaptiveCardUtils.GetAdaptiveCardAction(submitJson, stepContext.Context.Activity.From.AadObjectId);
 
             // Figure out what was done
-            if (r.Action == CardConstants.CardActionValLearnerTasksDone)
+            if (action is CourseTasksUpdateInfo)
             {
-                var update = new CourseTasksUpdateInfo(submitJson, stepContext.Context.Activity.From.AadObjectId);
+                var update = (CourseTasksUpdateInfo)action;
                 await update.SendReply(stepContext.Context, cancellationToken, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword, _configuration.SharePointSiteId);
-
+                return await stepContext.EndDialogAsync(null);
             }
-            else if (r.Action == CardConstants.CardActionValStartIntroduction)
+            else if (action is ActionResponseForSharePointItem)
             {
-                var spAction = JsonConvert.DeserializeObject<ActionResponseForSharePointItem>(submitJson);
-
                 var token = await AuthHelper.GetToken(stepContext.Context.Activity.Conversation.TenantId, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword);
                 var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
-                var attendanceInfo = await CourseAttendance.LoadById(graphClient, _configuration.SharePointSiteId, spAction.SPID);
+                var update = (ActionResponseForSharePointItem)action;
 
-
+                var attendanceInfo = await CourseAttendance.LoadById(graphClient, _configuration.SharePointSiteId, update.SPID);
                 return await stepContext.BeginDialogAsync(nameof(UpdateProfileDialog), attendanceInfo, cancellationToken);
 
             }
@@ -190,17 +176,8 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
             }
 
             // Something else
-            return await ReplyWithNoIdeaAndEndDiag(stepContext, cancellationToken);
+            return await CommonDialogues.ReplyWithNoIdeaAndEndDiag(stepContext, cancellationToken);
 
-        }
-
-        private static async Task<DialogTurnResult> ReplyWithNoIdeaAndEndDiag(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text(
-                    $"You sent me something but I can't work out what, sorry! Try again?."
-                    ), cancellationToken);
-            return await stepContext.EndDialogAsync(null);
         }
 
     }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DigitalTrainingAssistant.Bot.Cards
+namespace DigitalTrainingAssistant.Models
 {
     /// <summary>
     /// A class that holds card constants that are used in multiple files.
@@ -28,6 +28,7 @@ namespace DigitalTrainingAssistant.Bot.Cards
         public static string FIELD_NAME_QACountry => "${QACountry}";
         public static string FIELD_NAME_QASpareTimeActivities => "${QASpareTimeActivities}";
         public static string FIELD_NAME_QAMobilePhoneNumber => "${QAMobilePhoneNumber}";
+        public static string FIELD_NAME_PROFILE_IMG => "${ProfileImg}";
 
         public static string CardFileNameAttendeeFixedQuestionsInput => "DigitalTrainingAssistant.Bot.Cards.Templates.AttendeeFixedQuestionsInput.json";
         public static string CardFileNameAttendeeFixedQuestionsPublication => "DigitalTrainingAssistant.Bot.Cards.Templates.AttendeeFixedQuestionsPublication.json";

@@ -13,16 +13,24 @@ namespace DigitalTrainingAssistant.Bot
 {
     public class BotConversationCache
     {
+        #region Privates & Constructors
+
         const string TABLE_NAME = "ConversationCache";
+        private ConcurrentDictionary<string, CachedUserAndConversationData> _userIdConversationCache = new();
+        private BotConfig _config;
+        private TableClient _tableClient;
+
         public BotConversationCache(BotConfig config)
         {
-            this.TableClient = new TableClient(
+            _config = config;   
+            this._tableClient = new TableClient(
                 config.Storage,
                 TABLE_NAME);
 
-            TableClient.CreateIfNotExists();
+            // Dev only: make sure the Azure Storage emulator is running or this will fail
+            _tableClient.CreateIfNotExists();
 
-            var queryResultsFilter = TableClient.Query<CachedUserAndConversationData>(filter: $"PartitionKey eq '{CachedUserAndConversationData.PartitionKeyVal}'");
+            var queryResultsFilter = _tableClient.Query<CachedUserAndConversationData>(filter: $"PartitionKey eq '{CachedUserAndConversationData.PartitionKeyVal}'");
             foreach (var qEntity in queryResultsFilter)
             {
                 _userIdConversationCache.AddOrUpdate(qEntity.RowKey, qEntity, (key, newValue) => qEntity);
@@ -30,11 +38,7 @@ namespace DigitalTrainingAssistant.Bot
             }
 
         }
-
-        private ConcurrentDictionary<string, CachedUserAndConversationData> _userIdConversationCache = new ConcurrentDictionary<string, CachedUserAndConversationData>();
-
-        private TableClient TableClient { get; set; }
-        public int RefrenceCount => _userIdConversationCache.Count;
+        #endregion
 
         internal async Task RemoveFromCache(string aadObjectId)
         {
@@ -44,7 +48,19 @@ namespace DigitalTrainingAssistant.Bot
                 _userIdConversationCache.TryRemove(aadObjectId, out u);
             }
 
-            await TableClient.DeleteEntityAsync(CachedUserAndConversationData.PartitionKeyVal, aadObjectId);
+            await _tableClient.DeleteEntityAsync(CachedUserAndConversationData.PartitionKeyVal, aadObjectId);
+        }
+
+        /// <summary>
+        /// App installed for user & now we have a conversation reference to cache for future chat threads.
+        /// </summary>
+        public async Task AddConversationReferenceToCache(Activity activity)
+        {
+            var token = await AuthHelper.GetToken(activity.Conversation.TenantId, _config.MicrosoftAppId, _config.MicrosoftAppPassword);
+            var graphClient = AuthHelper.GetAuthenticatedClient(token);
+
+            var conversationReference = activity.GetConversationReference();
+            await AddOrUpdateUserAndConversationId(conversationReference, activity.ServiceUrl, graphClient);
         }
 
         internal async Task AddOrUpdateUserAndConversationId(ConversationReference conversationReference, string serviceUrl, GraphServiceClient graphClient)
@@ -58,7 +74,7 @@ namespace DigitalTrainingAssistant.Bot
                 Response<CachedUserAndConversationData> entityResponse = null;
                 try
                 {
-                    entityResponse = TableClient.GetEntity<CachedUserAndConversationData>(CachedUserAndConversationData.PartitionKeyVal, conversationReference.User.Id);
+                    entityResponse = _tableClient.GetEntity<CachedUserAndConversationData>(CachedUserAndConversationData.PartitionKeyVal, conversationReference.User.Id);
                 }
                 catch (RequestFailedException ex)
                 {
@@ -84,7 +100,7 @@ namespace DigitalTrainingAssistant.Bot
                         EmailAddress = user.UserPrincipalName
                     };
                     u.ConversationId = conversationReference.Conversation.Id;
-                    TableClient.AddEntity(u);
+                    _tableClient.AddEntity(u);
                 }
                 else
                 {
