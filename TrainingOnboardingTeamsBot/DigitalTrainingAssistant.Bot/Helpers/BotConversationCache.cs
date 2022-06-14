@@ -56,7 +56,7 @@ namespace DigitalTrainingAssistant.Bot
         /// </summary>
         public async Task AddConversationReferenceToCache(Activity activity)
         {
-            var token = await AuthHelper.GetToken(activity.Conversation.TenantId, _config.MicrosoftAppId, _config.MicrosoftAppPassword);
+            var token = await AuthHelper.GetToken(_config.TenantId, _config.MicrosoftAppId, _config.MicrosoftAppPassword);
             var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
             var conversationReference = activity.GetConversationReference();

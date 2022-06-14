@@ -53,7 +53,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
                     try
                     {
                         // Find users to notify for outstanding tasks
-                        var coursesFound = await _botHelper.RemindClassMembersWithOutstandingTasks((ITurnContext<IMessageActivity>)stepContext.Context, cancellationToken, false);
+                        var coursesFound = await _botHelper.RemindClassMembersWithOutstandingTasks((ITurnContext<IMessageActivity>)stepContext.Context, _configuration.TenantId, cancellationToken, false);
 
                         // Send actions summary back to trainer
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text(
@@ -125,12 +125,13 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
             if (action is CourseTasksUpdateInfo)
             {
                 var update = (CourseTasksUpdateInfo)action;
-                await update.SendReply(stepContext.Context, cancellationToken, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword, _configuration.SharePointSiteId);
+                await update.SendReply(stepContext.Context, cancellationToken, 
+                    _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword, _configuration.TenantId, _configuration.SharePointSiteId);
                 return await stepContext.EndDialogAsync(null);
             }
             else if (action is ActionResponseForSharePointItem)
             {
-                var token = await AuthHelper.GetToken(stepContext.Context.Activity.Conversation.TenantId, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword);
+                var token = await AuthHelper.GetToken(_configuration.TenantId, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword);
                 var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
                 var update = (ActionResponseForSharePointItem)action;

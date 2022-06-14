@@ -38,11 +38,11 @@ namespace DigitalTrainingAssistant.Models
         }
         #endregion
 
-        public async Task SendReply(ITurnContext turnContext, CancellationToken cancellationToken, string appId, string appPassword, string siteId)
+        public async Task SendReply(ITurnContext turnContext, CancellationToken cancellationToken, string appId, string appPassword, string tenantId, string siteId)
         {
             if (this.HasChanges)
             {
-                var token = await AuthHelper.GetToken(turnContext.Activity.Conversation.TenantId, appId, appPassword);
+                var token = await AuthHelper.GetToken(tenantId, appId, appPassword);
                 var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
                 // Save to SP list

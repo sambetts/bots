@@ -95,9 +95,9 @@ namespace DigitalTrainingAssistant.Bot.Helpers
             }
         }
 
-        public async Task<PendingUserActions> RemindClassMembersWithOutstandingTasks(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken, bool filterByCourseReminderDays)
+        public async Task<PendingUserActions> RemindClassMembersWithOutstandingTasks(ITurnContext<IMessageActivity> turnContext, string tenantId, CancellationToken cancellationToken, bool filterByCourseReminderDays)
         {
-            var token = await AuthHelper.GetToken(turnContext.Activity.Conversation.TenantId, Config.MicrosoftAppId, Config.MicrosoftAppPassword);
+            var token = await AuthHelper.GetToken(Config.TenantId, Config.MicrosoftAppId, Config.MicrosoftAppPassword);
             var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
             var conversationReference = turnContext.Activity.GetConversationReference();
@@ -107,7 +107,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
 
             var userTalkingEmail = _conversationCache.GetCachedUsers().Where(u => u.RowKey == conversationReference.User.AadObjectId).SingleOrDefault();
 
-            return await RemindClassMembersWithOutstandingTasks(turnContext.Adapter, userTalkingEmail.EmailAddress, turnContext.Activity.Conversation.TenantId, cancellationToken, filterByCourseReminderDays);
+            return await RemindClassMembersWithOutstandingTasks(turnContext.Adapter, userTalkingEmail.EmailAddress, tenantId, cancellationToken, filterByCourseReminderDays);
         }
 
         async Task<bool> CheckIfUserHasActionsAndSendMessagesIfNeeded(CachedUserAndConversationData user, PendingUserActions userPendingActions, BotAdapter botAdapter, GraphServiceClient graphClient, CancellationToken cancellationToken)

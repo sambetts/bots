@@ -28,7 +28,7 @@ namespace DigitalTrainingAssistant.Bot
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
-            var token = await AuthHelper.GetToken(turnContext.Activity.Conversation.TenantId, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword);
+            var token = await AuthHelper.GetToken(_configuration.TenantId, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword);
             var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
             // Load all course data from lists

@@ -97,7 +97,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
             // Send intro preview
 
             // DUP CLIENT
-            var token = await AuthHelper.GetToken(stepContext.Context.Activity.Conversation.TenantId, _botConfig.MicrosoftAppId, 
+            var token = await AuthHelper.GetToken(_botConfig.TenantId, _botConfig.MicrosoftAppId, 
                 _botConfig.MicrosoftAppPassword);
             var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
@@ -150,7 +150,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
 
 
                     // DUP CLIENT
-                    var token = await AuthHelper.GetToken(stepContext.Context.Activity.Conversation.TenantId, _botConfig.MicrosoftAppId,
+                    var token = await AuthHelper.GetToken(_botConfig.TenantId, _botConfig.MicrosoftAppId,
                         _botConfig.MicrosoftAppPassword);
                     var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
@@ -285,7 +285,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
             {
                 var introductionData = (IntroduceYourselfResponse)action;
 
-                var token = await AuthHelper.GetToken(stepContext.Context.Activity.Conversation.TenantId, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword);
+                var token = await AuthHelper.GetToken(_configuration.TenantId, _configuration.MicrosoftAppId, _configuration.MicrosoftAppPassword);
                 var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
                 var attendanceInfo = await CourseAttendance.LoadById(graphClient, _configuration.SharePointSiteId, introductionData.SPID);
