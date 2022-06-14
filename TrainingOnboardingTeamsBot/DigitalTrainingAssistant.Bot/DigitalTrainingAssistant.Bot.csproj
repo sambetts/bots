@@ -19,6 +19,7 @@
     <Content Remove="Cards\Templates\AttendeeFixedQuestionsInput.json" />
     <Content Remove="Cards\Templates\AttendeeFixedQuestionsPublication.json" />
     <Content Remove="Cards\Templates\BotIntroduction.json" />
+    <Content Remove="Cards\Templates\BotIntroductionReactive.json" />
     <Content Remove="Cards\Templates\CourseWelcome.json" />
   </ItemGroup>
 
@@ -27,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Cards\Templates\BotIntroductionReactive.json" />
     <EmbeddedResource Include="Cards\Templates\DefaultCourseImageBase64.txt" />
   </ItemGroup>
 

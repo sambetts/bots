@@ -1,0 +1,30 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.3",
+  "body": [
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "auto",
+          "spacing": "None",
+          "items": [
+            {
+              "type": "TextBlock",
+              "wrap": true,
+              "text": "\"${BotName}\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Hi, I'm the \"${BotName}\". I help course attendees prepare for their courses. If you're an attendee of a course, you'll likely hear from me later :)",
+      "size": "Medium",
+      "wrap": true
+    }
+  ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
+}

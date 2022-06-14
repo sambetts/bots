@@ -1,4 +1,5 @@
-﻿using DigitalTrainingAssistant.Bot.Dialogues.Abstract;
+﻿using DigitalTrainingAssistant.Bot.Cards;
+using DigitalTrainingAssistant.Bot.Dialogues.Abstract;
 using DigitalTrainingAssistant.Bot.Helpers;
 using DigitalTrainingAssistant.Models;
 using Microsoft.Bot.Builder;
@@ -40,6 +41,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
             var inputText = stepContext.Context.Activity.Text ?? string.Empty;
             var val = stepContext.Context.Activity.Value ?? string.Empty;
 
+            // Text response or adaptive-card action?
             if (val != null && !string.IsNullOrEmpty(val.ToString()))
             {
                 return await HandleCardResponse(stepContext, val.ToString(), cancellationToken, _configuration);
@@ -107,6 +109,16 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text(
                             $"Forgot you from {removeCount} courses."
                         ), cancellationToken);
+                }
+                else
+                {
+                    // No idea what to do. Send this
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text(
+                            $"Hi, sorry, I didn't get that..."
+                        ), cancellationToken);
+
+                    var introCardAttachment = new BotIntroductionReactiveCard(BotConstants.BotName).GetCardAttachment();
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Attachment(introCardAttachment));
                 }
                 return await stepContext.EndDialogAsync(null, cancellationToken);
             }

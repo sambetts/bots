@@ -32,7 +32,8 @@ namespace DigitalTrainingAssistant.Models
 
         public static string CardFileNameAttendeeFixedQuestionsInput => "DigitalTrainingAssistant.Bot.Cards.Templates.AttendeeFixedQuestionsInput.json";
         public static string CardFileNameAttendeeFixedQuestionsPublication => "DigitalTrainingAssistant.Bot.Cards.Templates.AttendeeFixedQuestionsPublication.json";
-        public static string CardFileNameBotIntroduction => "DigitalTrainingAssistant.Bot.Cards.Templates.BotIntroduction.json";
+        public static string CardFileNameBotIntroductionProactive => "DigitalTrainingAssistant.Bot.Cards.Templates.BotIntroduction.json";
+        public static string CardFileNameBotIntroductionReactive => "DigitalTrainingAssistant.Bot.Cards.Templates.BotIntroductionReactive.json";
         public static string CardFileNameCourseWelcome => "DigitalTrainingAssistant.Bot.Cards.Templates.CourseWelcome.json";
         public static string CardFileNameIntroduceYourself => "DigitalTrainingAssistant.Bot.Cards.Templates.IntroduceYourself.json";
         public static string CardFileNameLearnerQuestions => "DigitalTrainingAssistant.Bot.Cards.Templates.LearnerQuestions.json";

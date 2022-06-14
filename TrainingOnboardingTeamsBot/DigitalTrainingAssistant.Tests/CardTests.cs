@@ -14,7 +14,7 @@ namespace DigitalTrainingAssistant.Tests
         public void SimpleCardLoadTest()
         {
 
-            var botWelcomeCard = new BotWelcomeCard("Botulus Bob");
+            var botWelcomeCard = new BotIntroductionProactiveCard("Botulus Bob");
             Assert.IsNotNull(botWelcomeCard.GetCardContent());
 
             var attendeeFixedQuestionsInputCard = new AttendeeFixedQuestionsInputCard(new CourseAttendance { });
