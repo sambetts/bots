@@ -65,8 +65,9 @@ namespace DigitalTrainingAssistant.Bot
 
         internal async Task AddOrUpdateUserAndConversationId(ConversationReference conversationReference, string serviceUrl, GraphServiceClient graphClient)
         {
+            var cacheId = conversationReference.User.Id;
             CachedUserAndConversationData u = null;
-            if (!_userIdConversationCache.TryGetValue(conversationReference.User.AadObjectId, out u))
+            if (!_userIdConversationCache.TryGetValue(cacheId, out u))
             {
 
                 // Have not got in memory cache
@@ -95,7 +96,7 @@ namespace DigitalTrainingAssistant.Bot
                     // Not in storage account either. Add there
                     u = new CachedUserAndConversationData()
                     {
-                        RowKey = conversationReference.User.AadObjectId,
+                        RowKey = cacheId,
                         ServiceUrl = serviceUrl,
                         EmailAddress = user.UserPrincipalName
                     };
@@ -109,7 +110,7 @@ namespace DigitalTrainingAssistant.Bot
             }
 
             // Update memory cache
-            _userIdConversationCache.AddOrUpdate(conversationReference.User.AadObjectId, u, (key, newValue) => u);
+            _userIdConversationCache.AddOrUpdate(cacheId, u, (key, newValue) => u);
         }
 
 

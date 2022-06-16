@@ -38,29 +38,39 @@ namespace DigitalTrainingAssistant.Bot
             {
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
-                    // Add current user to conversation reference.
-                    await _conversationCache.AddConversationReferenceToCache(turnContext.Activity as Activity);
-
-                    // Now figure out if user needs to do something
-                    var user = _conversationCache.GetCachedUser(turnContext.Activity.GetConversationReference().User.AadObjectId);
-                    var pendingTrainingActions = courseInfo.GetUserActionsWithThingsToDo(true).GetActionsByEmail(user.EmailAddress);
-
-                    // Send bot intro if they're on a course
-                    if (pendingTrainingActions.Actions.Count > 0)
+                    // Is this an Azure AD user?
+                    if (string.IsNullOrEmpty(member.AadObjectId))
                     {
-                        var introCardAttachment = new BotIntroductionProactiveCard(BotConstants.BotName).GetCardAttachment();
-                        await turnContext.SendActivityAsync(MessageFactory.Attachment(introCardAttachment));
+                        await turnContext.SendActivityAsync(MessageFactory.Text($"Hi, anonynous user. I only work with Azure AD users in Teams normally..."));
+                    }
+                    else
+                    {
+                        // Add current user to conversation reference.
+                        await _conversationCache.AddConversationReferenceToCache(turnContext.Activity as Activity);
 
-                        // Send outstanding tasks
-                        try
+                        // Now figure out if user needs to do something
+                        var user = _conversationCache.GetCachedUser(turnContext.Activity.GetConversationReference().User.AadObjectId);
+                        var pendingTrainingActions = courseInfo.GetUserActionsWithThingsToDo(true).GetActionsByEmail(user.EmailAddress);
+
+                        // Send bot intro if they're on a course
+                        if (pendingTrainingActions.Actions.Count > 0)
                         {
-                            await _helper.SendCourseIntroAndTrainingRemindersToUser(user, turnContext, cancellationToken, pendingTrainingActions, graphClient);
-                        }
-                        catch (GraphAccessException ex)
-                        {
-                            await turnContext.SendActivityAsync(MessageFactory.Text(ex.Message));
+                            var introCardAttachment = new BotIntroductionProactiveCard(BotConstants.BotName).GetCardAttachment();
+                            await turnContext.SendActivityAsync(MessageFactory.Attachment(introCardAttachment));
+
+                            // Send outstanding tasks
+                            try
+                            {
+                                await _helper.SendCourseIntroAndTrainingRemindersToUser(user, turnContext, cancellationToken, pendingTrainingActions, graphClient);
+                            }
+                            catch (GraphAccessException ex)
+                            {
+                                await turnContext.SendActivityAsync(MessageFactory.Text(ex.Message));
+                            }
                         }
                     }
+
+                    
                 }
             }
         }

@@ -105,9 +105,12 @@ namespace DigitalTrainingAssistant.Bot.Helpers
             // Ensure calling user is fully cached
             await _conversationCache.AddOrUpdateUserAndConversationId(conversationReference, turnContext.Activity.ServiceUrl, graphClient);
 
-            var userTalkingEmail = _conversationCache.GetCachedUsers().Where(u => u.RowKey == conversationReference.User.AadObjectId).SingleOrDefault();
-
-            return await RemindClassMembersWithOutstandingTasks(turnContext.Adapter, userTalkingEmail.EmailAddress, tenantId, cancellationToken, filterByCourseReminderDays);
+            var userTalkingEmail = _conversationCache.GetCachedUsers().Where(u => u.RowKey == conversationReference.User.Id).SingleOrDefault();
+            if (userTalkingEmail != null && !string.IsNullOrEmpty(userTalkingEmail.EmailAddress))
+            {
+                return await RemindClassMembersWithOutstandingTasks(turnContext.Adapter, userTalkingEmail.EmailAddress, tenantId, cancellationToken, filterByCourseReminderDays);
+            }
+            else return new PendingUserActions();
         }
 
         async Task<bool> CheckIfUserHasActionsAndSendMessagesIfNeeded(CachedUserAndConversationData user, PendingUserActions userPendingActions, BotAdapter botAdapter, GraphServiceClient graphClient, CancellationToken cancellationToken)
@@ -169,7 +172,7 @@ namespace DigitalTrainingAssistant.Bot.Helpers
             }
 
             // Install for anyone not cached yet. Will also trigger a reminder for each user
-            var cachedConversationEmailAddresses = _conversationCache.GetCachedUsers().Select(u => u.EmailAddress.ToLower());
+            var cachedConversationEmailAddresses = _conversationCache.GetCachedUsers().Select(u => u.EmailAddress?.ToLower());
             var actionsEmailAddresses = pendingTrainingActionsForCoursesThisUserIsTeaching.UniqueUsers.Select(u => u.User.Email.ToLower());
             var uncachedEmailAddresses = actionsEmailAddresses.Except(cachedConversationEmailAddresses);
             foreach (var userEmailToInstallApp in uncachedEmailAddresses)
