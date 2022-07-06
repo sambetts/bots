@@ -3,7 +3,6 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Builder.TraceExtensions;
 using Microsoft.Bot.Connector.Authentication;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.BotBuilderSamples
@@ -22,8 +21,8 @@ namespace Microsoft.BotBuilderSamples
                 logger.LogError(exception, $"[OnTurnError] unhandled error : {exception.Message}");
 
                 // Send a message to the user
-                await turnContext.SendActivityAsync("The bot encountered an error or bug.");
-                await turnContext.SendActivityAsync("To continue to run this bot, please fix the bot source code.");
+                await turnContext.SendActivityAsync("Oops, something unexpected happened and I hit a problem.");
+                await turnContext.SendActivityAsync("Please check the error logged and try again.");
 
                 if (conversationState != null)
                 {
