@@ -61,10 +61,29 @@ namespace DigitalTrainingAssistant.Models
             return val;
         }
 
-        protected int GetFieldInt(ListItem item, string propName)
+
+        protected DateTime? GetFieldDateTime(ListItem item, string propName)
+        {
+            var startString = GetFieldValue(item, propName);
+            var dt = DateTime.MinValue;
+            if (DateTime.TryParse(startString, out dt))
+            {
+                return dt;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        protected int GetFieldInt(ListItem item, string propName) 
+        {
+            return GetFieldInt(item, propName, 0);
+        }
+        protected int GetFieldInt(ListItem item, string propName, int defaultValue)
         {
             var str = GetFieldValue(item, propName);
-            var intVal = 0;
+            var intVal = defaultValue;
 
             if (!string.IsNullOrEmpty(str))
             {
@@ -98,7 +117,7 @@ namespace DigitalTrainingAssistant.Models
 
         protected BaseSPItemWithUser(ListItem item, List<SiteUser> allUsers, string userFieldName) : base(item)
         {
-            var userId = GetFieldInt(item, userFieldName);
+            var userId = GetFieldInt(item, userFieldName, 0);
 
             if (userId != 0)
             {

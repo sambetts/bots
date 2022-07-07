@@ -10,6 +10,36 @@ namespace DigitalTrainingAssistant.Tests
     [TestClass]
     public class CoursesMetadataTests : BaseUnitTest
     {
+        [TestMethod]
+        public void RemindersEndDateTests()
+        {
+            var trainer = new SiteUser { Name = "trainer" };
+            var atendee = new SiteUser { Name = "atendee" };
+
+            var course = new Course
+            {
+                Start = DateTime.Now.AddMinutes(-10),
+                Name = "Course that's already started",
+                User = trainer,
+                DaysBeforeToSendReminders = 3,
+                Attendees = new List<CourseAttendance> { new CourseAttendance { User = atendee } },
+                CheckListItems = new List<CheckListItem> { new CheckListItem { Requirement = "Test requirement" } }
+            };
+            var meta = new CoursesMetadata()
+            {
+                Courses = new List<Course> { course }
+            };
+
+            // We should get none, as no end date & start date has passed
+            var resultsWithinCourseDaysBeforeToSendReminders = meta.GetUserActionsWithThingsToDo(true);
+            Assert.IsTrue(resultsWithinCourseDaysBeforeToSendReminders.UniqueCourses.Count == 0);
+
+            // Set end date as later than now & try again
+            course.End = DateTime.Now.AddDays(3);
+            resultsWithinCourseDaysBeforeToSendReminders = meta.GetUserActionsWithThingsToDo(true);
+            Assert.IsTrue(resultsWithinCourseDaysBeforeToSendReminders.UniqueCourses.Count == 1);
+        }
+
         /// <summary>
         /// Tests that DaysBeforeToSendReminders is taken into 
         /// </summary>

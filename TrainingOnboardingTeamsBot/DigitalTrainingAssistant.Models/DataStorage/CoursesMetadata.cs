@@ -170,20 +170,30 @@ namespace DigitalTrainingAssistant.Models
             var usersWithStuffToDoStill = new List<PendingUserActionsForCourse>();
 
             // Look for courses that are in range
-            IEnumerable<Course> courses = null;
+            var coursesInScope = new List<Course>();
             if (!filterByCourseReminderDays)
             {
                 // Just get courses that haven't started yet
-                courses = Courses.Where(c => courseFitler.Contains(c) && c.Start.HasValue && c.Start.Value > DateTime.Today);
+                coursesInScope = Courses.Where(c => courseFitler.Contains(c) && c.Start.HasValue && c.Start.Value > DateTime.Today).ToList();
             }
             else
             {
                 // Get courses that fall in the "days before course start" reminder
-                courses = Courses.Where(c => courseFitler.Contains(c) && c.Start.HasValue && c.Start.Value < DateTime.Now.AddDays(c.DaysBeforeToSendReminders));
+                foreach (var c in Courses.Where(c=> c.Start.HasValue))
+                {
+                    var compareDT = c.Start.Value;
+                    if (c.End.HasValue) compareDT = c.End.Value;
+
+                    var earliestTimeToRemind = c.Start.Value.AddDays(c.DaysBeforeToSendReminders * -1);
+                    if (DateTime.Now >= earliestTimeToRemind && DateTime.Now <= compareDT)
+                    {
+                        coursesInScope.Add(c);
+                    }
+                }
             }
 
             // Build custom task-list
-            foreach (var c in courses)
+            foreach (var c in coursesInScope)
             {
                 foreach (var attendee in c.Attendees)
                 {

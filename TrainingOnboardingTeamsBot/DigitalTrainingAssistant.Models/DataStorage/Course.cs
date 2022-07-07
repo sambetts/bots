@@ -8,40 +8,30 @@ namespace DigitalTrainingAssistant.Models
 
     public class Course : BaseSPItemWithUser
     {
-        public Course()
-        { 
-        }
+        public Course() { }
 
         public Course(ListItem courseItem, List<SiteUser> allUsers) : base(courseItem, allUsers, "TrainerLookupId")
         {
             this.Name = base.GetFieldValue(courseItem, "Title");
             this.WelcomeMessage = base.GetFieldValue(courseItem, "WelcomeMessage");
             this.TeamId = base.GetFieldValue(courseItem, "TeamID");
-            this.TeamChannelId = base.GetFieldValue(courseItem, "ChannelID");
+            this.GeneralTeamChannelId = base.GetFieldValue(courseItem, "ChannelID");
+            this.IntroductionTeamChannelId = base.GetFieldValue(courseItem, "IntroductionChannelID");
             this.Link = base.GetFieldValue(courseItem, "LearnerAppLink");
             this.ImageBase64Data = base.GetFieldValue(courseItem, "CourseImgBase64");
+   
+            // Default 3 days
+            this.DaysBeforeToSendReminders = base.GetFieldInt(courseItem, "DaysBeforeToSendReminders", 3);
 
-            var daysBeforeToSendRemindersString = base.GetFieldValue(courseItem, "DaysBeforeToSendReminders");
-            var days = 3;       // Default 3 days
-            int.TryParse(daysBeforeToSendRemindersString, out days);
-            this.DaysBeforeToSendReminders = days;
-
-            var startString = base.GetFieldValue(courseItem, "Start");
-            var dt = DateTime.MinValue;
-            if (DateTime.TryParse(startString, out dt))
-            {
-                this.Start = dt;
-            }
-            else
-            {
-                this.Start = null;
-            }
+            this.Start = GetFieldDateTime(courseItem, "Start");
+            this.End = GetFieldDateTime(courseItem, "End");
         }
 
         #region Props
 
         public SiteUser Trainer => base.User;
         public DateTime? Start { get; set; }
+        public DateTime? End { get; set; }
         public string Name { get; set; }
         public string WelcomeMessage { get; set; }
         public List<CheckListItem> CheckListItems { get; set; } = new List<CheckListItem>();
@@ -51,8 +41,26 @@ namespace DigitalTrainingAssistant.Models
         public string ImageBase64Data { get; set; }
         public string Link { get; set; }
         public string TeamId { get; set; }
-        public string TeamChannelId { get; set; }
-        public bool HasValidTeamsSettings => !string.IsNullOrEmpty(TeamId) && !string.IsNullOrEmpty(TeamChannelId);
+
+        /// <summary>
+        /// Either the introduction channel or the general channel. 
+        /// </summary>
+        public string PostToTeamChannelId
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(IntroductionTeamChannelId))
+                {
+                    return IntroductionTeamChannelId;
+                }
+                return GeneralTeamChannelId;
+            } 
+        }
+        public string GeneralTeamChannelId { get; set; }
+        public string IntroductionTeamChannelId { get; set; }
+
+
+        public bool HasValidTeamsSettings => !string.IsNullOrEmpty(TeamId) && !string.IsNullOrEmpty(PostToTeamChannelId);
 
         #endregion
 

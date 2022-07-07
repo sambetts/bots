@@ -162,7 +162,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
                     var conversationParameters = new ConversationParameters
                     {
                         IsGroup = true,
-                        ChannelData = new { channel = new { id = courseAttendance.ParentCourse.TeamChannelId } },
+                        ChannelData = new { channel = new { id = courseAttendance.ParentCourse.PostToTeamChannelId } }, 
                         Activity = (Activity)message,
                     };
 
@@ -237,7 +237,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
                 var conversationParameters = new ConversationParameters
                 {
                     IsGroup = true,
-                    ChannelData = new { channel = new { id = courseAttendance.ParentCourse.TeamChannelId } },
+                    ChannelData = new { channel = new { id = courseAttendance.ParentCourse.GeneralTeamChannelId } },
                     Activity = (Activity)message,
                 };
 
