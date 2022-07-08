@@ -34,9 +34,15 @@ namespace DigitalTrainingAssistant.Tests
             var resultsWithinCourseDaysBeforeToSendReminders = meta.GetUserActionsWithThingsToDo(true);
             Assert.IsTrue(resultsWithinCourseDaysBeforeToSendReminders.UniqueCourses.Count == 0);
 
+            resultsWithinCourseDaysBeforeToSendReminders = meta.GetUserActionsWithThingsToDo(false);            // Test again & ignore "days before"
+            Assert.IsTrue(resultsWithinCourseDaysBeforeToSendReminders.UniqueCourses.Count == 0);
+
             // Set end date as later than now & try again
             course.End = DateTime.Now.AddDays(3);
             resultsWithinCourseDaysBeforeToSendReminders = meta.GetUserActionsWithThingsToDo(true);
+            Assert.IsTrue(resultsWithinCourseDaysBeforeToSendReminders.UniqueCourses.Count == 1);
+
+            resultsWithinCourseDaysBeforeToSendReminders = meta.GetUserActionsWithThingsToDo(false);            // Test again & ignore "days before"
             Assert.IsTrue(resultsWithinCourseDaysBeforeToSendReminders.UniqueCourses.Count == 1);
         }
 

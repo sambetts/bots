@@ -173,8 +173,16 @@ namespace DigitalTrainingAssistant.Models
             var coursesInScope = new List<Course>();
             if (!filterByCourseReminderDays)
             {
-                // Just get courses that haven't started yet
-                coursesInScope = Courses.Where(c => courseFitler.Contains(c) && c.Start.HasValue && c.Start.Value > DateTime.Today).ToList();
+                foreach (var c in Courses.Where(c => c.Start.HasValue))
+                {
+                    var compareDT = c.Start.Value;
+                    if (c.End.HasValue) compareDT = c.End.Value;
+
+                    if (DateTime.Now >= c.Start.Value && DateTime.Now <= compareDT)
+                    {
+                        coursesInScope.Add(c);
+                    }
+                }
             }
             else
             {
@@ -184,6 +192,7 @@ namespace DigitalTrainingAssistant.Models
                     var compareDT = c.Start.Value;
                     if (c.End.HasValue) compareDT = c.End.Value;
 
+                    // Take into consideration DaysBeforeToSendReminders
                     var earliestTimeToRemind = c.Start.Value.AddDays(c.DaysBeforeToSendReminders * -1);
                     if (DateTime.Now >= earliestTimeToRemind && DateTime.Now <= compareDT)
                     {
