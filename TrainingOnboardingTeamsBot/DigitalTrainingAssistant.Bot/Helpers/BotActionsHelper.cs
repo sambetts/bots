@@ -153,21 +153,24 @@ namespace DigitalTrainingAssistant.Bot.Helpers
                 // Send notification to all the members for this users classes
                 foreach (var user in _conversationCache.GetCachedUsers())
                 {
-
-                    // Does this user have any custom training actions?
-                    var thisUserPendingActions = pendingTrainingActionsForCoursesThisUserIsTeaching.GetActionsByEmail(user.EmailAddress);
-                    if (thisUserPendingActions.Actions.Count > 0)
+                    if (!string.IsNullOrEmpty(user.EmailAddress))
                     {
-                        try
+                        // Does this user have any custom training actions?
+                        var thisUserPendingActions = pendingTrainingActionsForCoursesThisUserIsTeaching.GetActionsByEmail(user.EmailAddress);
+                        if (thisUserPendingActions.Actions.Count > 0)
                         {
-                            await CheckIfUserHasActionsAndSendMessagesIfNeeded(user, thisUserPendingActions, botAdapter, graphClient, cancellationToken);
-                        }
-                        catch (ErrorResponseException)
-                        {
-                            // Something wierd happened resuming the conversation. Assume invalid conversation reference cache
-                            await _conversationCache.RemoveFromCache(user.RowKey);
+                            try
+                            {
+                                await CheckIfUserHasActionsAndSendMessagesIfNeeded(user, thisUserPendingActions, botAdapter, graphClient, cancellationToken);
+                            }
+                            catch (ErrorResponseException)
+                            {
+                                // Something wierd happened resuming the conversation. Assume invalid conversation reference cache
+                                await _conversationCache.RemoveFromCache(user.RowKey);
+                            }
                         }
                     }
+                    
                 }
             }
 

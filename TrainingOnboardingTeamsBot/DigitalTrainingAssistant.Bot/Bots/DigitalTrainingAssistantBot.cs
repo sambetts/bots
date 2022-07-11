@@ -49,7 +49,7 @@ namespace DigitalTrainingAssistant.Bot
                         await _conversationCache.AddConversationReferenceToCache(turnContext.Activity as Activity);
 
                         // Now figure out if user needs to do something
-                        var user = _conversationCache.GetCachedUser(turnContext.Activity.GetConversationReference().User.AadObjectId);
+                        var user = _conversationCache.GetCachedUser(turnContext.Activity.GetConversationReference().User.Id);
                         var pendingTrainingActions = courseInfo.GetUserActionsWithThingsToDo(true).GetActionsByEmail(user.EmailAddress);
 
                         // Send bot intro if they're on a course

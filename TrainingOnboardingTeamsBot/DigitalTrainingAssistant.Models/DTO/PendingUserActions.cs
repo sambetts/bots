@@ -46,6 +46,11 @@ namespace DigitalTrainingAssistant.Models
         }
         public PendingUserActions GetActionsByEmail(string email)
         {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentException($"'{nameof(email)}' cannot be null or empty.", nameof(email));
+            }
+
             return new PendingUserActions { Actions = Actions.Where(a => a.Attendee?.User?.Email?.ToLower() == email.ToLower()).ToList() };
         }
         public override string ToString()
