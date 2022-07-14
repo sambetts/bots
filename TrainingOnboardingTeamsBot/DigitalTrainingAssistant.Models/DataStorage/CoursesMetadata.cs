@@ -176,9 +176,11 @@ namespace DigitalTrainingAssistant.Models
                 foreach (var c in Courses.Where(c => c.Start.HasValue))
                 {
                     var compareDT = c.Start.Value;
-                    if (c.End.HasValue) compareDT = c.End.Value;
-
-                    if (DateTime.Now >= c.Start.Value && DateTime.Now <= compareDT)
+                    if (c.End.HasValue && c.End.Value > DateTime.Now)
+                    {
+                        coursesInScope.Add(c);
+                    }
+                    else if (DateTime.Now >= c.Start.Value)
                     {
                         coursesInScope.Add(c);
                     }
