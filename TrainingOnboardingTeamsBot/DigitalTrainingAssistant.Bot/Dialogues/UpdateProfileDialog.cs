@@ -149,28 +149,27 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
                     var credentials = new MicrosoftAppCredentials(_botConfig.MicrosoftAppId, _botConfig.MicrosoftAppPassword);
 
 
-                    // DUP CLIENT
+                    // Todo: optimise duplicate Auth client
                     var token = await AuthHelper.GetToken(_botConfig.TenantId, _botConfig.MicrosoftAppId,
                         _botConfig.MicrosoftAppPassword);
                     var graphClient = AuthHelper.GetAuthenticatedClient(token);
 
+                    // Send intro card to Team channel
                     var previewCard = new AttendeeFixedQuestionsPublicationCard(courseAttendance);
                     await previewCard.LoadProfileImage(graphClient, stepContext.Context.Activity.From.AadObjectId);
-
                     var message = MessageFactory.Attachment(previewCard.GetCardAttachment());
 
+                    // Start new thread in channel
                     var conversationParameters = new ConversationParameters
                     {
                         IsGroup = true,
                         ChannelData = new { channel = new { id = courseAttendance.ParentCourse.PostToTeamChannelId } }, 
                         Activity = (Activity)message,
                     };
-
-                    ConversationReference conversationReference = null;
-
                     var success = false;
                     try
                     {
+                        ConversationReference conversationReference = null;
                         await stepContext.Context.Adapter.CreateConversationAsync(
                             _botConfig.MicrosoftAppId,
                             courseAttendance.ParentCourse.TeamId,
@@ -187,6 +186,7 @@ namespace DigitalTrainingAssistant.Bot.Dialogues
                     }
                     catch (ErrorResponseException ex)
                     {
+                        // Tell user post couldn't be submitted
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Couldn't update the team - {ex.Message}"), cancellationToken);
                     }
 

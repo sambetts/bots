@@ -64,7 +64,7 @@
     {
       "type": "Action.OpenUrl",
       "title": "Chat with me",
-      "url": "https://teams.microsoft.com/l/chat/0/0?users={AttendeeEmail}"
+      "url": "https://teams.microsoft.com/l/chat/0/0?users=${AttendeeEmail}"
     }
   ]
 }
