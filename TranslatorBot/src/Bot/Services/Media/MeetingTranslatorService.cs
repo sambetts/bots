@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace TranslatorBot.Services.Media
 {
@@ -39,7 +40,7 @@ namespace TranslatorBot.Services.Media
         private SpeechRecognizer _recognizer;
         private readonly SpeechSynthesizer _synthesizer;
 
-        private readonly Translator _translatorService;
+        private readonly AzureTranslatorClient _translatorService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MeetingTranslatorService" /> class.
@@ -50,7 +51,7 @@ namespace TranslatorBot.Services.Media
             _toLanguage = toLanguage;
 
             _logger = logger;
-            _translatorService = new Translator(settings.TranslatorConfigBaseUrl, settings.TranslatorConfigKey);
+            _translatorService = new AzureTranslatorClient(settings.TranslatorConfigBaseUrl, settings.TranslatorConfigKey, settings.TranslatorConfigRegion, logger);
             _speechInputConfig = SpeechConfig.FromSubscription(settings.SpeechConfigKey, settings.SpeechConfigRegion);
             _speechOutputConfig = SpeechConfig.FromSubscription(settings.SpeechConfigKey, settings.SpeechConfigRegion);
             _speechOutputConfig.SpeechSynthesisLanguage = toLanguage;
@@ -229,12 +230,14 @@ namespace TranslatorBot.Services.Media
         private async Task TranslateTextToSpeech(string spokenText)
         {
             // Translate
-            var translationResult = await _translatorService.TranslateAsync(spokenText, _toLanguage);
+            var translationResult = await _translatorService.TranslateAsync(spokenText, _fromLanguage, _toLanguage);
 
-            foreach (var translatedSentence in translationResult)
+            // convert the text to speech
+            var replySentence = translationResult.Translations.FirstOrDefault()?.Text;
+
+            if (!string.IsNullOrEmpty(replySentence))
             {
-                // convert the text to speech
-                var result = await _synthesizer.SpeakTextAsync(translatedSentence);
+                var result = await _synthesizer.SpeakTextAsync(replySentence);
 
                 // take the stream of the result
                 // create 20ms media buffers of the stream

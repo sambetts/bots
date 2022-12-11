@@ -404,7 +404,7 @@
     <Compile Include="Http\LoggingMessageHandler.cs" />
     <Compile Include="Media\MeetingTranslatorService.cs" />
     <Compile Include="Media\MediaStreamEventArgs.cs" />
-    <Compile Include="Media\Translator.cs" />
+    <Compile Include="Media\AzureTranslatorClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceSetup\AppHost.cs" />
     <Compile Include="ServiceSetup\AppSettings.cs" />

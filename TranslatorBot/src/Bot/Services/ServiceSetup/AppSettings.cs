@@ -67,6 +67,7 @@
 
         public string TranslatorConfigKey { get; set; }
         public string TranslatorConfigBaseUrl { get; set; }
+        public string TranslatorConfigRegion { get; set; }
 
         /// <summary>
         /// Gets or sets the Load Balancer port for the specific VM instance
