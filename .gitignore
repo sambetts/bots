@@ -11,3 +11,4 @@
 /artifacts
 /TrainingOnboardingTeamsBot/DigitalTrainingAssistant.Bot/appsettings.Development.json
 /TranslatorBot/src/Bot/TranslatorBot/appsettings.json
+/TranslatorBot/src/Bot/UnitTests/app.config
