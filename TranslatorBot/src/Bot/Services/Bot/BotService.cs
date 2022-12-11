@@ -277,7 +277,7 @@ namespace TranslatorBot.Services.Bot
         {
             foreach (var call in args.AddedResources)
             {
-                var callHandler = new CallHandler(call, _settings, "en-GB", "en-GB", _logger);
+                var callHandler = new CallHandler(call, _settings, "en-GB", "es-ES", _logger);
                 this.CallHandlers[call.Id] = callHandler;
             }
 
