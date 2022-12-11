@@ -169,7 +169,7 @@ namespace TranslatorBot.Services.Media
                         _logger.LogInformation($"RECOGNIZED: Text={e.Result.Text}");
                         // We recognized the speech
                         // Now do Speech to Text
-                        await TranslateTextToSpeech(e.Result.Text);
+                        await TranslateTextAndConvertToSpeech(e.Result.Text);
                     }
                     else if (e.Result.Reason == ResultReason.NoMatch)
                     {
@@ -194,7 +194,7 @@ namespace TranslatorBot.Services.Media
                 _recognizer.SessionStarted += async (s, e) =>
                 {
                     _logger.LogInformation("\nSession started event.");
-                    await TranslateTextToSpeech("Hello");
+                    await TranslateTextAndConvertToSpeech("Hello");
                 };
 
                 _recognizer.SessionStopped += (s, e) =>
@@ -227,7 +227,7 @@ namespace TranslatorBot.Services.Media
             _isDraining = false;
         }
 
-        private async Task TranslateTextToSpeech(string spokenText)
+        private async Task TranslateTextAndConvertToSpeech(string spokenText)
         {
             // Translate
             var translationResult = await _translatorService.TranslateAsync(spokenText, _fromLanguage, _toLanguage);

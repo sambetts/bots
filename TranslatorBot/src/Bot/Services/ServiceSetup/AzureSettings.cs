@@ -84,6 +84,7 @@ namespace TranslatorBot.Services.ServiceSetup
             if (string.IsNullOrEmpty(_settings.SpeechConfigRegion)) throw new ArgumentNullException(nameof(_settings.SpeechConfigRegion));
             if (string.IsNullOrEmpty(_settings.TranslatorConfigKey)) throw new ArgumentNullException(nameof(_settings.TranslatorConfigKey));
             if (string.IsNullOrEmpty(_settings.TranslatorConfigBaseUrl)) throw new ArgumentNullException(nameof(_settings.TranslatorConfigBaseUrl));
+            if (string.IsNullOrEmpty(_settings.TranslatorConfigRegion)) throw new ArgumentNullException(nameof(_settings.TranslatorConfigRegion));
 
             _logger.LogInformation("Fetching Certificate");
             X509Certificate2 defaultCertificate = this.GetCertificateFromStore();
