@@ -1,10 +1,11 @@
 ﻿
+
 namespace TranslatorBot.Model.Models
 {
     /// <summary>
     /// The join call body.
     /// </summary>
-    public class JoinCallBody
+    public class JoinCallBody : ILanguageSettings
     {
         /// <summary>
         /// Gets or sets the Teams meeting join URL.

@@ -1,16 +1,4 @@
-// ***********************************************************************
-// Assembly         : TranslatorBot.Services
-// Author           : JasonTheDeveloper
-// Created          : 09-07-2020
-//
-// Last Modified By : bcage29
-// Last Modified On : 02-28-2022
-// ***********************************************************************
-// <copyright file="BotService.cs" company="Microsoft">
-//     Copyright ©  2020
-// </copyright>
-// <summary></summary>
-// ***********************************************************************
+
 using Microsoft.Graph;
 using Microsoft.Graph.Communications.Calls;
 using Microsoft.Graph.Communications.Calls.Media;
@@ -64,6 +52,11 @@ namespace TranslatorBot.Services.Bot
         /// </summary>
         /// <value>The call handlers.</value>
         public ConcurrentDictionary<string, CallHandler> CallHandlers { get; } = new ConcurrentDictionary<string, CallHandler>();
+
+        /// <summary>
+        /// Language settings for each call
+        /// </summary>
+        public ConcurrentDictionary<string, ILanguageSettings> CallLanguageSettings { get; } = new ConcurrentDictionary<string, ILanguageSettings>();
 
         /// <summary>
         /// Gets the entry point for stateful bot.
@@ -182,6 +175,9 @@ namespace TranslatorBot.Services.Bot
             var statefulCall = await this.Client.Calls().AddAsync(joinParams, scenarioId).ConfigureAwait(false);
             statefulCall.GraphLogger.Info($"Call creation complete: {statefulCall.Id}");
             _logger.LogInformation($"Call creation complete: {statefulCall.Id}");
+
+            // Remember language settings for call
+            this.CallLanguageSettings.TryAdd(statefulCall.Id, joinCallBody);
             return statefulCall;
         }
 
@@ -269,7 +265,7 @@ namespace TranslatorBot.Services.Bot
         }
 
         /// <summary>
-        /// Updated call handler.
+        /// Updated call handler & language settings.
         /// </summary>
         /// <param name="sender">The <see cref="ICallCollection" /> sender.</param>
         /// <param name="args">The <see cref="CollectionEventArgs{ICall}" /> instance containing the event data.</param>
@@ -277,7 +273,10 @@ namespace TranslatorBot.Services.Bot
         {
             foreach (var call in args.AddedResources)
             {
-                var callHandler = new CallHandler(call, _settings, "en-GB", "es-ES", _logger);
+                // Get language settings for call
+                var callLangConfig = this.CallLanguageSettings[call.Id];
+
+                var callHandler = new CallHandler(call, _settings, callLangConfig.FromLanguage, callLangConfig.ToLanguage, _logger);
                 this.CallHandlers[call.Id] = callHandler;
             }
 
@@ -287,6 +286,8 @@ namespace TranslatorBot.Services.Bot
                 {
                     handler.Dispose();
                 }
+
+                this.CallLanguageSettings.TryRemove(call.Id, out ILanguageSettings languageSettings);
             }
         }
 

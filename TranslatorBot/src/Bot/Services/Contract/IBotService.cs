@@ -41,6 +41,8 @@ namespace TranslatorBot.Services.Contract
         /// <returns>The <see cref="ICall" /> that was requested to join.</returns>
         Task<ICall> JoinCallAsync(JoinCallBody joinCallBody);
 
+        ConcurrentDictionary<string, ILanguageSettings> CallLanguageSettings { get; }
+
         void Dispose();
     }
 }

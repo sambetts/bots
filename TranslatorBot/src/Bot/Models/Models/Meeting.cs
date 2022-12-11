@@ -1,16 +1,4 @@
-﻿// ***********************************************************************
-// Assembly         : TranslatorBot.Model
-// Author           : JasonTheDeveloper
-// Created          : 09-07-2020
-//
-// Last Modified By : dannygar
-// Last Modified On : 08-17-2020
-// ***********************************************************************
-// <copyright file="Meeting.cs" company="Microsoft">
-//     Copyright ©  2020
-// </copyright>
-// <summary></summary>
-// ***********************************************************************
+﻿
 using System.Runtime.Serialization;
 
 namespace TranslatorBot.Model.Models
