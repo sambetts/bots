@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
-using AzureCognitiveTranslator;
 
 namespace TranslatorBot.Services.Media
 {
@@ -230,8 +229,7 @@ namespace TranslatorBot.Services.Media
         private async Task TranslateTextToSpeech(string spokenText)
         {
             // Translate
-            _translatorService.AddContent(spokenText);
-            var translationResult = await _translatorService.TranslateAsync(_toLanguage);
+            var translationResult = await _translatorService.TranslateAsync(spokenText, _toLanguage);
 
             foreach (var translatedSentence in translationResult)
             {
