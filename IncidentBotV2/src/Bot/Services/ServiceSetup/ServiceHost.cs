@@ -56,7 +56,6 @@ namespace TranslatorBot.Services.ServiceSetup
             services.Configure<AppSettings>(appSettings);
             services.AddSingleton<IAzureSettings, AzureSettings>();
             services.AddSingleton<IBotService, BotService>();
-            services.AddSingleton<IBotMediaLogger, BotMediaLogger>();
 
             services.Configure<TelemetryConfiguration>(config => config.TelemetryChannel = channel);
             services.AddLogging(build =>

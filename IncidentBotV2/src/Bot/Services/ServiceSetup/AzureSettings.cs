@@ -1,11 +1,8 @@
-﻿using Microsoft.Skype.Bots.Media;
-using TranslatorBot.Model.Constants;
+﻿using TranslatorBot.Model.Constants;
 using TranslatorBot.Services.Contract;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Security.Cryptography.X509Certificates;
-using TranslatorBot.Services.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -30,22 +27,14 @@ namespace TranslatorBot.Services.ServiceSetup
         /// <value>The call control base URL.</value>
         public Uri CallControlBaseUrl { get; set; }
 
-        /// <summary>
-        /// Gets the media platform settings.
-        /// </summary>
-        /// <value>The media platform settings.</value>
-        public MediaPlatformSettings MediaPlatformSettings { get; private set; }
 
         private readonly ILogger _logger;
         private readonly AppSettings _settings;
-        private readonly BotMediaLogger _mediaPlatformLogger;
 
-        public AzureSettings(ILogger<AzureSettings> logger, IOptions<AppSettings> settings, IBotMediaLogger mediaLogger)
+        public AzureSettings(ILogger<AzureSettings> logger, IOptions<AppSettings> settings)
         {
             _logger = logger;
             _settings = settings.Value;
-            //_mediaPlatformLogger = (MediaLogger)mediaLogger.Value;
-            _mediaPlatformLogger = (BotMediaLogger)mediaLogger;
         }
 
         /// <summary>
@@ -109,20 +98,6 @@ namespace TranslatorBot.Services.ServiceSetup
             controlListenUris.Add($"{_settings.BotInternalHostingProtocol}://{baseDomain}:{_settings.BotInternalPort}/");
 
             this.CallControlListeningUrls = controlListenUris;
-            _logger.LogInformation("Initializing Media");
-            this.MediaPlatformSettings = new MediaPlatformSettings()
-            {
-                MediaPlatformInstanceSettings = new MediaPlatformInstanceSettings()
-                {
-                    CertificateThumbprint = defaultCertificate.Thumbprint,
-                    InstanceInternalPort = _settings.MediaInternalPort,
-                    InstancePublicIPAddress = IPAddress.Any,
-                    InstancePublicPort = _settings.MediaInstanceExternalPort,
-                    ServiceFqdn = _settings.MediaDnsName
-                },
-                ApplicationId = _settings.AadAppId,
-                MediaPlatformLogger = _mediaPlatformLogger
-            };
 
             _logger.LogInformation($"-----EXTERNAL-----");
             _logger.LogInformation($"Listening on: {botCallingExternalUrl} (New Incoming calls)");

@@ -1,13 +1,10 @@
 ﻿
 using Microsoft.Graph;
 using Microsoft.Graph.Communications.Calls;
-using Microsoft.Graph.Communications.Calls.Media;
 using Microsoft.Graph.Communications.Client;
 using Microsoft.Graph.Communications.Common;
 using Microsoft.Graph.Communications.Common.Telemetry;
 using Microsoft.Graph.Communications.Resources;
-using Microsoft.Skype.Bots.Media;
-using TranslatorBot.Model.Models;
 using TranslatorBot.Services.Contract;
 using TranslatorBot.Services.ServiceSetup;
 using TranslatorBot.Services.Util;
@@ -172,7 +169,6 @@ namespace TranslatorBot.Services.Bot
 
             builder.SetAuthenticationProvider(authProvider);
             builder.SetNotificationUrl(_azureSettings.CallControlBaseUrl);
-            builder.SetMediaPlatformSettings(_azureSettings.MediaPlatformSettings);
             builder.SetServiceBaseUrl(new Uri(AppConstants.PlaceCallEndpointUrl));
 
             this.Client = builder.Build();
@@ -477,38 +473,6 @@ namespace TranslatorBot.Services.Bot
         }
 
         /// <summary>
-        /// Creates the local media session.
-        /// </summary>
-        /// <param name="mediaSessionId">The media session identifier.
-        /// This should be a unique value for each call.</param>
-        /// <returns>The <see cref="ILocalMediaSession" />.</returns>
-        private ILocalMediaSession CreateLocalMediaSession(Guid mediaSessionId = default)
-        {
-            try
-            {
-                // create media session object, this is needed to establish call connections
-                return this.Client.CreateMediaSession(
-                    new AudioSocketSettings
-                    {
-                        StreamDirections = StreamDirection.Sendrecv,
-                        // Note! Currently, the only audio format supported when receiving unmixed audio is Pcm16K
-                        SupportedAudioFormat = AudioFormat.Pcm16K,
-                        ReceiveUnmixedMeetingAudio = false //get the extra buffers for the speakers
-                    },
-                    new VideoSocketSettings
-                    {
-                        StreamDirections = StreamDirection.Inactive
-                    },
-                    mediaSessionId: mediaSessionId);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
-                throw;
-            }
-        }
-
-        /// <summary>
         /// Incoming call handler.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -548,12 +512,15 @@ namespace TranslatorBot.Services.Bot
                     endpointType = call.Resource.Source.EndpointType;
                 }
 
-                IMediaSession mediaSession = Guid.TryParse(call.Id, out Guid callId)
-                    ? this.CreateLocalMediaSession(callId)
-                    : this.CreateLocalMediaSession();
+
+                var mediaToPrefetch = new List<MediaInfo>();
+                foreach (var m in this.MediaMap)
+                {
+                    mediaToPrefetch.Add(m.Value.MediaInfo);
+                }
 
                 // Answer call
-                call?.AnswerAsync(mediaSession).ForgetAndLogExceptionAsync(
+                call?.AnswerAsync(mediaToPrefetch, new[] { Modality.Audio }).ForgetAndLogExceptionAsync(
                     call.GraphLogger,
                     $"Answering call {call.Id} with scenario {call.ScenarioId}.");
             });
