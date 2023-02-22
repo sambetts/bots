@@ -56,7 +56,7 @@ namespace TranslatorBot.Services.Bot
         /// <summary>
         /// Language settings for each call
         /// </summary>
-        public ConcurrentDictionary<string, ILanguageSettings> CallLanguageSettings { get; } = new ConcurrentDictionary<string, ILanguageSettings>();
+        public ConcurrentDictionary<Guid, ILanguageSettings> CallLanguageSettings { get; } = new ConcurrentDictionary<Guid, ILanguageSettings>();
 
         /// <summary>
         /// Gets the entry point for stateful bot.
@@ -172,12 +172,13 @@ namespace TranslatorBot.Services.Bot
                 };
             }
 
+            // Remember language settings for call
+            this.CallLanguageSettings.TryAdd(scenarioId, joinCallBody);
+
             var statefulCall = await this.Client.Calls().AddAsync(joinParams, scenarioId).ConfigureAwait(false);
             statefulCall.GraphLogger.Info($"Call creation complete: {statefulCall.Id}");
             _logger.LogInformation($"Call creation complete: {statefulCall.Id}");
 
-            // Remember language settings for call
-            this.CallLanguageSettings.TryAdd(statefulCall.Id, joinCallBody);
             return statefulCall;
         }
 
@@ -274,7 +275,7 @@ namespace TranslatorBot.Services.Bot
             foreach (var call in args.AddedResources)
             {
                 // Get language settings for call
-                var callLangConfig = this.CallLanguageSettings[call.Id];
+                var callLangConfig = this.CallLanguageSettings[call.ScenarioId];
 
                 var callHandler = new CallHandler(call, _settings, callLangConfig.FromLanguage, callLangConfig.ToLanguage, _logger);
                 this.CallHandlers[call.Id] = callHandler;
@@ -287,7 +288,7 @@ namespace TranslatorBot.Services.Bot
                     handler.Dispose();
                 }
 
-                this.CallLanguageSettings.TryRemove(call.Id, out ILanguageSettings languageSettings);
+                this.CallLanguageSettings.TryRemove(call.ScenarioId, out ILanguageSettings languageSettings);
             }
         }
 

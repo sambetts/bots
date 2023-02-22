@@ -5,6 +5,7 @@ using TranslatorBot.Services.Bot;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using TranslatorBot.Model.Models;
+using System;
 
 namespace TranslatorBot.Services.Contract
 {
@@ -41,7 +42,7 @@ namespace TranslatorBot.Services.Contract
         /// <returns>The <see cref="ICall" /> that was requested to join.</returns>
         Task<ICall> JoinCallAsync(JoinCallBody joinCallBody);
 
-        ConcurrentDictionary<string, ILanguageSettings> CallLanguageSettings { get; }
+        ConcurrentDictionary<Guid, ILanguageSettings> CallLanguageSettings { get; }
 
         void Dispose();
     }
